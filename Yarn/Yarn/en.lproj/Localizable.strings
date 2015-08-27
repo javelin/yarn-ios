@@ -1,0 +1,15 @@
+/* 
+  Localizable.strings
+  Yarn
+
+  Created by Mark Jundo Documento on 8/14/15.
+  Copyright (c) 2015 Mark Jundo Documento. All rights reserved.
+*/
+
+"Cancel" = "Cancel";
+"Close" = "Close";
+"Help" = "Help";
+"Title" = "Title";
+"Tags" = "Tags";
+
+"__About Format__" = "%@ v%@\n\nMobile editor and player for Twine games.\n\nCopyright © 2015 Mark Jundo P. Documento\n\nTwine version compatibility %@.";
