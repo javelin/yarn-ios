@@ -21,7 +21,11 @@
 @property (nonatomic, readonly, weak) NSArray *proofingFormats;
 @property (nonatomic, weak) StoryFormat *proofingFormat;
 
-- (id)initWithStory:(Story *)story formats:(NSArray *)formats proofingFormats:(NSArray *)proofingFormats showSettings:(BOOL)showSettings;
+- (id)initWithStory:(Story *)story
+            formats:(NSArray *)formats
+    proofingFormats:(NSArray *)proofingFormats
+       showSettings:(BOOL)showSettings
+         completion:(void (^)(Story *story))handler;
 - (PassageView *)getPassageViewWithName:(NSString *)name;
 - (PassageView *)getPassageViewWithId:(NSInteger)Id;
 

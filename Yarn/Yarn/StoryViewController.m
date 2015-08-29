@@ -15,6 +15,7 @@
 #import "WebViewController.h"
 
 @interface StoryViewController () {
+    void (^_completionHandler)(Story *story);
     NSMutableDictionary* _passageViews;
     BOOL _showSettings;
     BOOL _isClosing;
@@ -39,10 +40,12 @@ static CGFloat GridSpacing = 140.0;
 - (id)initWithStory:(Story *)story
             formats:(NSArray *)formats
     proofingFormats:(NSArray *)proofingFormats
-       showSettings:(BOOL)showSettings {
+       showSettings:(BOOL)showSettings
+         completion:(void (^)(Story *))handler {
     self = [super init];
     if (self) {
         _story = story;
+        _completionHandler = handler;
         
         _formats = formats;
         _proofingFormats = proofingFormats;
@@ -208,6 +211,9 @@ static CGFloat GridSpacing = 140.0;
     [_story
      save:^(Story *story) {
          [[self navigationController] popViewControllerAnimated:YES];
+         if (_completionHandler) {
+             _completionHandler(_story);
+         }
      }
      error:^(NSError *error) {
          AlertError([NSString stringWithFormat:_LS(@"Unable to save the story.\n%@"),

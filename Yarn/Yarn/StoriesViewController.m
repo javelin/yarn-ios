@@ -145,12 +145,14 @@ typedef enum StorySortMethod {
                                  completion:^(Story *story) {
                                      HIDE_WAIT();
                                      [_stories addObject:story];
-                                     [[self tableView] reloadData];
                                      StoryViewController *storyViewController =
                                      [[StoryViewController alloc] initWithStory:story
                                                                         formats:storyFormats
                                                                 proofingFormats:[[HomeViewController sharedInstance] proofingFormats]
-                                                                   showSettings:YES];
+                                                                   showSettings:YES
+                                                                     completion:^(Story *story) {
+                                                                         [[self tableView] reloadData];
+                                                                     }];
                                      [[self navigationController] pushViewController:storyViewController
                                                                             animated:YES];
                                  }
@@ -237,7 +239,10 @@ typedef enum StorySortMethod {
          [[StoryViewController alloc] initWithStory:story
                                             formats:[[HomeViewController sharedInstance] storyFormats]
                                     proofingFormats:[[HomeViewController sharedInstance] proofingFormats]
-                                       showSettings:NO];
+                                       showSettings:NO
+                                         completion:^(Story *story) {
+                                             [[self tableView] reloadData];
+                                         }];
          [[self navigationController] pushViewController:storyViewController animated:YES];
      }
      error:^(NSError *error) {
