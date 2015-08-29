@@ -2,12 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>com.mjdocumento.yarn.source.url</key>
-	<string>https://github.com/javelin/yarn-ios</string>
-	<key>com.mjdocumento.twine.version</key>
-	<string>2.0.8</string>
-	<key>com.mjdocumento.my.email</key>
-	<string>doc.javelin@gmail.com</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleExecutable</key>
@@ -21,7 +15,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
+	<string>0.9</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
@@ -47,5 +41,11 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>com.mjdocumento.my.email</key>
+	<string>doc.javelin@gmail.com</string>
+	<key>com.mjdocumento.twine.version</key>
+	<string>2.0.8</string>
+	<key>com.mjdocumento.yarn.source.url</key>
+	<string>https://github.com/javelin/yarn-ios</string>
 </dict>
 </plist>
