@@ -361,51 +361,7 @@ static CGFloat GridSpacing = 140.0;
 }
 
 - (void)handlePublish {
-    if (!_formats.count) {
-        AlertError(_LS(@"No story formats found."),
-                   self);
-    }
-    else {
-        for (StoryFormat *format in _formats) {
-            if ([[format name] isEqualToString:[_story storyFormat]]) {
-                SHOW_WAIT();
-                [format
-                 publishStory:_story
-                 startId:-1
-                 options:@[]
-                 createZip:YES
-                 completion:^(Story *story, NSString *path) {
-                     HIDE_WAIT();
-                     if ([[path pathExtension] isEqualToString:@"zip"]) {
-                         NSURL *url = [NSURL URLWithString:[@"file://" stringByAppendingString:path]];
-                         NSLog(@"Exporting %@", url);
-                         _exportInteractionController =
-                         [UIDocumentInteractionController interactionControllerWithURL:url];
-                         [_exportInteractionController
-                          presentOpenInMenuFromBarButtonItem:[[self navigationItem] leftBarButtonItem]
-                          animated:YES];
-                     }
-                     else {
-                         WebViewController *webViewController =
-                         [[WebViewController alloc] initWithPath:path];
-                         [webViewController setTitle:[_story name]];
-                         [[self navigationController] pushViewController:webViewController
-                                                                animated:YES];
-                     }
-                 }
-                 error:^(NSError *error) {
-                     HIDE_WAIT();
-                     AlertError([NSString stringWithFormat:_LS(@"Unable to publish story.\n%@"),
-                                 [error localizedDescription]],
-                                self);
-                 }];
-                return;
-            }
-        }
-        AlertError([_LS(@"Missing story format:") stringByAppendingFormat:@" %@",
-                    [_story storyFormat]],
-                   self);
-    }
+    [self publish:NO createArchive:YES];
 }
 
 - (void)handleSetStartPassageIn:(PassageView *)passageView {
@@ -436,32 +392,7 @@ static CGFloat GridSpacing = 140.0;
 }
 
 - (void)handleViewProofingCopy {
-    if (!_proofingFormat && ![_proofingFormats count]) {
-        AlertError(_LS(@"No proofing formats found."), self);
-    }
-    else {
-        NSAssert(self.proofingFormat != nil, @"Proofing format must have been set already.");
-        SHOW_WAIT();
-        [_proofingFormat
-         publishStory:_story
-         startId:-1
-         options:@[]
-         createZip:NO
-         completion:^(Story *story, NSString *path) {
-             HIDE_WAIT();
-             WebViewController *webViewController =
-             [[WebViewController alloc] initWithPath:path];
-             [webViewController setTitle:[_story name]];
-             [[self navigationController] pushViewController:webViewController
-                                                    animated:YES];
-         }
-         error:^(NSError *error) {
-             HIDE_WAIT();
-             AlertError([NSString stringWithFormat:_LS(@"Unable to publish story.\n%@"),
-                         [error localizedDescription]],
-                        self);
-         }];
-    }
+    [self publish:YES createArchive:NO];
 }
 
 - (void)editStorySettings:(BOOL)newStory {
@@ -469,6 +400,71 @@ static CGFloat GridSpacing = 140.0;
     [[StorySettingsViewController alloc] initWithStoryViewController:self];
     [[self navigationController] pushViewController:storySettingsViewController
                                            animated:YES];
+}
+
+- (void)publish:(BOOL)proofing createArchive:(BOOL)createArchive {
+    if (proofing) {
+        NSAssert(_proofingFormat != nil, @"Proofing format must have been set already.");
+    }
+    NSArray *formats = proofing ? _proofingFormats:_formats;
+    if (![formats count] ||
+        (proofing && !_proofingFormat)) {
+        if (!proofing) {
+            AlertError(_LS(@"No proofing formats found."),
+                       self);
+        }
+        else {
+            AlertError(_LS(@"No story formats found."),
+                       self);
+        }
+    }
+    else {
+        StoryFormat *format = proofing ? _proofingFormat:nil;
+        for (StoryFormat *format_ in formats) {
+            if ([[format_ name] isEqualToString:[_story storyFormat]]) {
+                format = format_;
+                break;
+            }
+        }
+        if (format) {
+            SHOW_WAIT();
+            [format
+             publishStory:_story
+             startId:-1
+             options:@[]
+             createZip:createArchive
+             completion:^(Story *story, NSString *path) {
+                 HIDE_WAIT();
+                 if ([[path pathExtension] isEqualToString:@"zip"]) {
+                     NSURL *url = [NSURL fileURLWithPath:path];
+                     NSLog(@"Exporting %@", url);
+                     _exportInteractionController =
+                     [UIDocumentInteractionController interactionControllerWithURL:url];
+                     [_exportInteractionController
+                      presentOpenInMenuFromBarButtonItem:[[self navigationItem] leftBarButtonItem]
+                      animated:YES];
+                 }
+                 else {
+                     WebViewController *webViewController =
+                     [[WebViewController alloc] initWithPath:path];
+                     [webViewController setTitle:[_story name]];
+                     [[self navigationController] pushViewController:webViewController
+                                                            animated:YES];
+                 }
+             }
+             error:^(NSError *error) {
+                 HIDE_WAIT();
+                 AlertError([NSString stringWithFormat:_LS(@"Unable to publish story.\n%@"),
+                             [error localizedDescription]],
+                            self);
+             }];
+        }
+        else {
+            AlertError([_LS(@"Missing story format:") stringByAppendingFormat:@" %@",
+                        [_story storyFormat]],
+                       self);
+        }
+    }
 }
 
 #pragma mark Passages

@@ -6,7 +6,9 @@
 //  Copyright (c) 2015 Mark Jundo Documento. All rights reserved.
 //
 
+#import "Constants.h"
 #import "NSData+UTF8String.h"
+#import "SSZipArchive.h"
 #import "Story.h"
 #import "StoryFormat.h"
 #import "Utils.h"
@@ -53,7 +55,7 @@ typedef void (^StoryFormatCompletionBlock)(StoryFormat *storyFormat);
 }
 
 - (BOOL)isProofing {
-    return [[self.properties valueForKey:@"proofing"] boolValue];
+    return [[_properties valueForKey:@"proofing"] boolValue];
 }
 
 - (void)load:(void (^)(StoryFormat *storyFormat))completionHandler
@@ -77,11 +79,11 @@ typedef void (^StoryFormatCompletionBlock)(StoryFormat *storyFormat);
                                        str = [str stringByReplacingOccurrencesOfString:@"^\\s*window\\.storyFormat\\("
                                                                             withString:@""
                                                                                options:NSRegularExpressionSearch
-                                                                                 range:NSMakeRange(0, str.length)];
+                                                                                 range:NSMakeRange(0, [str length])];
                                        str = [str stringByReplacingOccurrencesOfString:@"\\);*\\s*$"
                                                                             withString:@""
                                                                                options:NSRegularExpressionSearch
-                                                                                 range:NSMakeRange(0, str.length)];
+                                                                                 range:NSMakeRange(0, [str length])];
                                        _properties = [NSJSONSerialization JSONObjectWithData:[str dataUsingEncoding:NSUTF8StringEncoding]
                                                                                      options:kNilOptions
                                                                                        error:&jerror];
@@ -112,7 +114,10 @@ typedef void (^StoryFormatCompletionBlock)(StoryFormat *storyFormat);
                      error:(NSError **)error {
     NSString *output = [_properties objectForKey:@"source"];
     
-    output = [output stringByReplacingOccurrencesOfString:@"{{STORY_NAME}}" withString:[story name] options:NSCaseInsensitiveSearch range:NSMakeRange(0, output.length)];
+    output = [output stringByReplacingOccurrencesOfString:@"{{STORY_NAME}}"
+                                               withString:[story name]
+                                                  options:NSCaseInsensitiveSearch
+                                                    range:NSMakeRange(0, [output length])];
     
     NSError *_error = nil;
     NSString *publishedContent = [story publishWithStartId:startId startIsOptional:[self isProofing] options:options error:&_error];
@@ -120,7 +125,10 @@ typedef void (^StoryFormatCompletionBlock)(StoryFormat *storyFormat);
         *error = _error;
         return nil;
     }
-    output = [output stringByReplacingOccurrencesOfString:@"{{STORY_DATA}}" withString:publishedContent options:NSCaseInsensitiveSearch range:NSMakeRange(0, output.length)];
+    output = [output stringByReplacingOccurrencesOfString:@"{{STORY_DATA}}"
+                                               withString:publishedContent
+                                                  options:NSCaseInsensitiveSearch
+                                                    range:NSMakeRange(0, [output length])];
     
     return output;
 }
@@ -237,17 +245,85 @@ typedef void (^StoryFormatCompletionBlock)(StoryFormat *storyFormat);
         
         NSString *symlinkPath = nil;
         if (![self isProofing]) {
-            symlinkPath = [story.path stringByAppendingPathComponent:@"game.html"];
+            symlinkPath = [[story path] stringByAppendingPathComponent:@"game.html"];
             [manager removeItemAtPath:symlinkPath error:nil];
             [manager createSymbolicLinkAtPath:symlinkPath withDestinationPath:path error:&error];
             if (error) {
-                NSLog(@"%@", error.localizedDescription);
+                NSLog(@"%@", [error localizedDescription]);
                 symlinkPath = nil;
             }
         }
-
+        
         if (createZip) {
-            //!TO DO!
+            NSString *fname =
+            [[story name] stringByReplacingOccurrencesOfString:@"[^a-zA-Z0-9_\\- ]"
+                                             withString:@""
+                                                options:NSRegularExpressionSearch
+                                                  range:NSMakeRange(0, [[story name] length])];
+            fname = [fname stringByAppendingFormat:@"-%@", [story ifId]];
+            fname = [fname stringByAppendingPathExtension:@"export"];
+            fname = [fname stringByAppendingPathExtension:@"zip"];
+            NSString *zpath = [[path stringByDeletingLastPathComponent]
+                               stringByAppendingPathComponent:fname];
+            NSLog(@"Creating zip archive at %@", zpath);
+            SSZipArchive *zipper = [[SSZipArchive alloc] initWithPath:zpath];
+            if (![zipper open]) {
+                if (errorHandler) {
+                    error = [NSError errorWithDomain:@"Story"
+                                                code:kCantOpenArchive
+                                            userInfo:@{NSLocalizedDescriptionKey:_LS(@"Unable to create archive file.")}];
+                    DISPATCH_ASYNC_MAIN(^{
+                        errorHandler(error);
+                    });
+                }
+                return;
+            }
+            if (![zipper writeFileAtPath:path withFileName:@"story.html"]) {
+                if (errorHandler) {
+                    error = [NSError errorWithDomain:@"Story"
+                                                code:kCantWriteToArchive
+                                            userInfo:@{NSLocalizedDescriptionKey:_LS(@"Unable to write file to archive.")}];
+                    DISPATCH_ASYNC_MAIN(^{
+                        errorHandler(error);
+                    });
+                }
+                return;
+            }
+            NSString *mediaPath = [path stringByAppendingPathComponent:@"images"];
+            NSArray *images = [manager contentsOfDirectoryAtPath:mediaPath error:&error];
+            if (error) {
+                NSLog(@"%@", [error localizedDescription]);
+            }
+            else {
+                for (NSString *imagePath in images) {
+                    NSLog(@"Archiving %@", imagePath);
+                    if (![zipper writeFileAtPath:[mediaPath stringByAppendingPathComponent:imagePath]
+                                    withFileName:[[mediaPath lastPathComponent]
+                                                  stringByAppendingPathComponent:imagePath]]) {
+                                        if (errorHandler) {
+                                            error = [NSError errorWithDomain:@"Story"
+                                                                        code:kCantWriteToArchive
+                                                                    userInfo:@{NSLocalizedDescriptionKey:_LS(@"Unable to write file to archive.")}];
+                                            DISPATCH_ASYNC_MAIN(^{
+                                                errorHandler(error);
+                                            });
+                                        }
+                                        return;
+                                    }
+                }
+            }
+            if (![zipper close]) {
+                if (errorHandler) {
+                    error = [NSError errorWithDomain:@"Story"
+                                                code:kCantCloseArchive
+                                            userInfo:@{NSLocalizedDescriptionKey:_LS(@"Unable to close archive file.")}];
+                    DISPATCH_ASYNC_MAIN(^{
+                        errorHandler(error);
+                    });
+                }
+                return;
+            }
+            path = zpath;
         }
         else if (symlinkPath) {
             path = symlinkPath;
@@ -266,7 +342,9 @@ typedef void (^StoryFormatCompletionBlock)(StoryFormat *storyFormat);
                   error:(void (^)(NSError *error))errorHandler {
     DISPATCH_ASYNC(^{
         NSFileManager *manager = [NSFileManager defaultManager];
-        NSString *_path = [self.name stringByReplacingOccurrencesOfString:@"[^a-zA-Z0-9_\\- ]" withString:@"" options:NSRegularExpressionSearch range:NSMakeRange(0, self.name.length)];
+        NSString *_path = [_name stringByReplacingOccurrencesOfString:@"[^a-zA-Z0-9_\\- ]"
+                                                           withString:@""
+                                                              options:NSRegularExpressionSearch range:NSMakeRange(0, [_name length])];
         _path = [path stringByAppendingPathComponent:_path];
         NSError *error = nil;
         if ([manager fileExistsAtPath:_path]) {
@@ -289,7 +367,7 @@ typedef void (^StoryFormatCompletionBlock)(StoryFormat *storyFormat);
             }
             return;
         }
-        NSData *data = [NSJSONSerialization dataWithJSONObject:self.properties options:NSJSONWritingPrettyPrinted error:&error];
+        NSData *data = [NSJSONSerialization dataWithJSONObject:_properties options:NSJSONWritingPrettyPrinted error:&error];
         if (error) {
             if (errorHandler) {
                 DISPATCH_ASYNC_MAIN(^{

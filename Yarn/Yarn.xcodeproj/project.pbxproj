@@ -10,6 +10,11 @@
 		4D0AA2621B859B1000507994 /* PassageEditorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0AA2611B859B0F00507994 /* PassageEditorViewController.m */; };
 		4D1E9A5A1B8B13DE008FD824 /* StorySettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1E9A591B8B13DE008FD824 /* StorySettingsViewController.m */; };
 		4D1E9A5E1B8B1634008FD824 /* SegmentedPagedViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1E9A5D1B8B1634008FD824 /* SegmentedPagedViewController.m */; };
+		4D247AAE1B92A02E00E12D94 /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D247AA41B92A02E00E12D94 /* ioapi.c */; };
+		4D247AAF1B92A02E00E12D94 /* mztools.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D247AA61B92A02E00E12D94 /* mztools.c */; };
+		4D247AB01B92A02E00E12D94 /* unzip.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D247AA81B92A02E00E12D94 /* unzip.c */; };
+		4D247AB11B92A02E00E12D94 /* zip.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D247AAA1B92A02E00E12D94 /* zip.c */; };
+		4D247AB21B92A02E00E12D94 /* SSZipArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D247AAD1B92A02E00E12D94 /* SSZipArchive.m */; };
 		4D399A531B8EE54C00A153C9 /* StoryFormatViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D399A521B8EE54C00A153C9 /* StoryFormatViewController.m */; };
 		4D4D9B851B7EDED200E1875B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4D9B841B7EDED200E1875B /* main.m */; };
 		4D4D9B881B7EDED200E1875B /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4D9B871B7EDED200E1875B /* AppDelegate.m */; };
@@ -76,6 +81,18 @@
 		4D1E9A591B8B13DE008FD824 /* StorySettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StorySettingsViewController.m; sourceTree = "<group>"; };
 		4D1E9A5C1B8B1634008FD824 /* SegmentedPagedViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SegmentedPagedViewController.h; sourceTree = "<group>"; };
 		4D1E9A5D1B8B1634008FD824 /* SegmentedPagedViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SegmentedPagedViewController.m; sourceTree = "<group>"; };
+		4D247AA31B92A02E00E12D94 /* crypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crypt.h; sourceTree = "<group>"; };
+		4D247AA41B92A02E00E12D94 /* ioapi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ioapi.c; sourceTree = "<group>"; };
+		4D247AA51B92A02E00E12D94 /* ioapi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ioapi.h; sourceTree = "<group>"; };
+		4D247AA61B92A02E00E12D94 /* mztools.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mztools.c; sourceTree = "<group>"; };
+		4D247AA71B92A02E00E12D94 /* mztools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mztools.h; sourceTree = "<group>"; };
+		4D247AA81B92A02E00E12D94 /* unzip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = unzip.c; sourceTree = "<group>"; };
+		4D247AA91B92A02E00E12D94 /* unzip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unzip.h; sourceTree = "<group>"; };
+		4D247AAA1B92A02E00E12D94 /* zip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = zip.c; sourceTree = "<group>"; };
+		4D247AAB1B92A02E00E12D94 /* zip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zip.h; sourceTree = "<group>"; };
+		4D247AAC1B92A02E00E12D94 /* SSZipArchive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SSZipArchive.h; sourceTree = "<group>"; };
+		4D247AAD1B92A02E00E12D94 /* SSZipArchive.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SSZipArchive.m; sourceTree = "<group>"; };
+		4D247AB31B92A0AE00E12D94 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = text; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		4D399A511B8EE54C00A153C9 /* StoryFormatViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StoryFormatViewController.h; sourceTree = "<group>"; };
 		4D399A521B8EE54C00A153C9 /* StoryFormatViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StoryFormatViewController.m; sourceTree = "<group>"; };
 		4D4D9B801B7EDED200E1875B /* Yarn.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Yarn.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -190,13 +207,50 @@
 			name = settings;
 			sourceTree = "<group>";
 		};
+		4D247AA01B92A01100E12D94 /* 3rd Party */ = {
+			isa = PBXGroup;
+			children = (
+				4D247AA11B92A02E00E12D94 /* SSZipArchive */,
+			);
+			name = "3rd Party";
+			sourceTree = "<group>";
+		};
+		4D247AA11B92A02E00E12D94 /* SSZipArchive */ = {
+			isa = PBXGroup;
+			children = (
+				4D247AA21B92A02E00E12D94 /* minizip */,
+				4D247AAC1B92A02E00E12D94 /* SSZipArchive.h */,
+				4D247AAD1B92A02E00E12D94 /* SSZipArchive.m */,
+			);
+			name = SSZipArchive;
+			path = ../ssziparchive/SSZipArchive;
+			sourceTree = "<group>";
+		};
+		4D247AA21B92A02E00E12D94 /* minizip */ = {
+			isa = PBXGroup;
+			children = (
+				4D247AA31B92A02E00E12D94 /* crypt.h */,
+				4D247AA41B92A02E00E12D94 /* ioapi.c */,
+				4D247AA51B92A02E00E12D94 /* ioapi.h */,
+				4D247AA61B92A02E00E12D94 /* mztools.c */,
+				4D247AA71B92A02E00E12D94 /* mztools.h */,
+				4D247AA81B92A02E00E12D94 /* unzip.c */,
+				4D247AA91B92A02E00E12D94 /* unzip.h */,
+				4D247AAA1B92A02E00E12D94 /* zip.c */,
+				4D247AAB1B92A02E00E12D94 /* zip.h */,
+			);
+			path = minizip;
+			sourceTree = "<group>";
+		};
 		4D4D9B771B7EDED200E1875B = {
 			isa = PBXGroup;
 			children = (
+				4D247AB31B92A0AE00E12D94 /* libz.tbd */,
+				4D247AA01B92A01100E12D94 /* 3rd Party */,
+				4D4D9B811B7EDED200E1875B /* Products */,
 				4D4D9B821B7EDED200E1875B /* Yarn */,
 				4D4D9B9C1B7EDED200E1875B /* YarnTests */,
 				4D4D9BA71B7EDED200E1875B /* YarnUITests */,
-				4D4D9B811B7EDED200E1875B /* Products */,
 			);
 			sourceTree = "<group>";
 		};
@@ -505,6 +559,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4DCDB73F1B8014FD0005252F /* StoryViewController.m in Sources */,
+				4D247AB01B92A02E00E12D94 /* unzip.c in Sources */,
 				4DE0E05E1B8A86A600A38055 /* AutosavingViewController.m in Sources */,
 				4DEB4F011B8DBC7E00D1FBB4 /* MediaGalleryViewCell.m in Sources */,
 				4DCDB7421B8015080005252F /* PassageView.m in Sources */,
@@ -524,18 +579,22 @@
 				4D4D9B881B7EDED200E1875B /* AppDelegate.m in Sources */,
 				4DCDB7311B8014AB0005252F /* ViewUtils.m in Sources */,
 				4DCDB7261B8014840005252F /* NSObject+Associative.m in Sources */,
+				4D247AB11B92A02E00E12D94 /* zip.c in Sources */,
 				4DCDB74C1B8015410005252F /* StoryFormat.m in Sources */,
 				4D4D9B851B7EDED200E1875B /* main.m in Sources */,
 				4DCDB7321B8014AB0005252F /* WebViewController.m in Sources */,
 				4DCDB7381B8014D00005252F /* StoryFormatsViewController.m in Sources */,
+				4D247AAF1B92A02E00E12D94 /* mztools.c in Sources */,
 				4DCDB74A1B8015410005252F /* Passage.m in Sources */,
 				4DCDB7281B8014840005252F /* Regex.m in Sources */,
 				4DCDB73E1B8014FD0005252F /* StoryView.m in Sources */,
 				4DCDB7301B8014AB0005252F /* NavigationController.m in Sources */,
 				4DCDB7271B8014840005252F /* NSString+TestNonEmpty.m in Sources */,
 				4DCDB7241B8014840005252F /* Constants.m in Sources */,
+				4D247AAE1B92A02E00E12D94 /* ioapi.c in Sources */,
 				4DA03E491B8B243200DA9A3F /* StorySettingsPageViewController.m in Sources */,
 				4D399A531B8EE54C00A153C9 /* StoryFormatViewController.m in Sources */,
+				4D247AB21B92A02E00E12D94 /* SSZipArchive.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -696,6 +755,7 @@
 				INFOPLIST_FILE = Yarn/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				OTHER_LDFLAGS = "-lz";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mjdocumento.Yarn;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -710,6 +770,7 @@
 				INFOPLIST_FILE = Yarn/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				OTHER_LDFLAGS = "-lz";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mjdocumento.Yarn;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
