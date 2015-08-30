@@ -194,10 +194,7 @@ static CGFloat GridSpacing = 140.0;
 
 #pragma mark Handlers
 - (void)handleArchiveProofingCopy {
-    AlertAndDismissInfo(_LS(@"Archive Proofing Copy"),
-                        _LS(@"Coming soon."),
-                        1.0,
-                        self);
+    [self publish:YES createArchive:YES];
 }
 
 - (void)handleArchiveStory {

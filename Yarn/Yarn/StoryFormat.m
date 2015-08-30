@@ -243,15 +243,12 @@ typedef void (^StoryFormatCompletionBlock)(StoryFormat *storyFormat);
             return;
         }
         
-        NSString *symlinkPath = nil;
-        if (![self isProofing]) {
-            symlinkPath = [[story path] stringByAppendingPathComponent:@"game.html"];
-            [manager removeItemAtPath:symlinkPath error:nil];
-            [manager createSymbolicLinkAtPath:symlinkPath withDestinationPath:path error:&error];
-            if (error) {
-                NSLog(@"%@", [error localizedDescription]);
-                symlinkPath = nil;
-            }
+        NSString *symlinkPath = [[story path] stringByAppendingPathComponent:[self isProofing] ? @"proof.html":@"game.html"];
+        [manager removeItemAtPath:symlinkPath error:nil];
+        [manager createSymbolicLinkAtPath:symlinkPath withDestinationPath:path error:&error];
+        if (error) {
+            NSLog(@"%@", [error localizedDescription]);
+            symlinkPath = nil;
         }
         
         if (createZip) {
