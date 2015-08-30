@@ -348,14 +348,6 @@
     [UIView setAnimationCurve:animationCurve];
     
     CGRect keyboardFrame = [[self view] convertRect:keyboardEndFrame toView:nil];
-    if (![_titleField isFirstResponder] &&
-        ![_tagsField isFirstResponder] &&
-        shown) {
-        [_topConstraint setConstant:-70];
-    }
-    else {
-        [_topConstraint setConstant:10];
-    }
     [_bottomConstraint setConstant:shown ? -CGRectGetHeight(keyboardFrame) - 10:-10];
     [[self view] setNeedsLayout];
     [[self view] layoutIfNeeded];
@@ -440,6 +432,7 @@
 
 #pragma mark UITextViewDelegate
 - (void)textViewDidBeginEditing:(nonnull UITextView *)textView {
+    [_topConstraint setConstant:-70];
     [_undoButtonItem setEnabled:[[textView undoManager] canUndo]];
     [_redoButtonItem setEnabled:[[textView undoManager] canRedo]];
     [_imageLinkButtonItem setEnabled:YES];
@@ -452,6 +445,7 @@
 }
 
 - (void)textViewDidEndEditing:(nonnull UITextView *)textView {
+    [_topConstraint setConstant:10];
     [_undoButtonItem setEnabled:NO];
     [_redoButtonItem setEnabled:NO];
     [_imageLinkButtonItem setEnabled:NO];
