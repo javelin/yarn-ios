@@ -172,10 +172,10 @@
     [inputAccessoryView addButtonWithTitle:@"]" handler:^(NSString *title) {
         [_textView replaceRange:_textView.selectedTextRange withText:title];
     }];
-    [inputAccessoryView addButtonWithTitle:@"<<" handler:^(NSString *title) {
+    [inputAccessoryView addButtonWithTitle:@"<" handler:^(NSString *title) {
         [_textView replaceRange:_textView.selectedTextRange withText:title];
     }];
-    [inputAccessoryView addButtonWithTitle:@">>" handler:^(NSString *title) {
+    [inputAccessoryView addButtonWithTitle:@">" handler:^(NSString *title) {
         [_textView replaceRange:_textView.selectedTextRange withText:title];
     }];
     [inputAccessoryView addButtonWithTitle:@"$" handler:^(NSString *title) {
