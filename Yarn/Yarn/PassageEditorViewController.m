@@ -18,6 +18,8 @@
 @property (nonatomic, strong) UITextField *tagsField;
 @property (nonatomic, strong) UITextView *textView;
 
+@property (nonatomic, strong) UIBarButtonItem* closeButtonItem;
+@property (nonatomic, strong) UIBarButtonItem* hideKeyboardButtonItem;
 @property (nonatomic, strong) UIBarButtonItem* trashButtonItem;
 @property (nonatomic, strong) UIBarButtonItem* imageLinkButtonItem;
 @property (nonatomic, strong) UIBarButtonItem* redoButtonItem;
@@ -40,12 +42,18 @@
         [self createViews];
         [self addConstraints];
         
-        UIBarButtonItem* closeBarButtonItem =
+        _closeButtonItem =
         [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"close"]
                                          style:UIBarButtonItemStylePlain
                                         target:self
                                         action:@selector(handleDoneEditing)];
-        [[self navigationItem] setLeftBarButtonItem:closeBarButtonItem];
+        [[self navigationItem] setLeftBarButtonItem:_closeButtonItem];
+        
+        _hideKeyboardButtonItem =
+        [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"hide-keyboard"]
+                                         style:UIBarButtonItemStylePlain
+                                        target:self
+                                        action:@selector(handleHideKeyboard)];
         
         _trashButtonItem =
         [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash
@@ -151,10 +159,7 @@
          forControlEvents:UIControlEventEditingChanged];
     
     InputAccessoryView *inputAccessoryView =
-    [[InputAccessoryView alloc] initWithHideHandler:IS_IPAD() ?
-                                                nil:^(NSString *title) {
-                                                    [[self view] endEditing:YES];
-                                                }];
+    [[InputAccessoryView alloc] initWithHideHandler:nil];
     INIT_VIEW(UITextView, _textView, [self view]);
     [_textView setAutocapitalizationType:UITextAutocapitalizationTypeSentences];
     [_textView setAutocorrectionType:UITextAutocorrectionTypeNo];
@@ -262,7 +267,7 @@
     [self updatePassage];
     NSAssert([_delegate respondsToSelector:@selector(passageEditorViewController:requestsToSave:)], @"id<PassageEditorViewControllerDelegate> must implement passageEditorViewController:requestsToSave:");
     [_delegate passageEditorViewController:self
-                          requestsToSave:_passageView];
+                            requestsToSave:_passageView];
 }
 
 #pragma mark Handlers
@@ -295,6 +300,10 @@
     [self invalidateAutosaveTimer];
     [self updatePassage];
     [[self navigationController] popViewControllerAnimated:YES];
+}
+
+- (void)handleHideKeyboard {
+    [[self view] endEditing:YES];
 }
 
 - (void)handleRedoEdit {
@@ -353,9 +362,9 @@
     [[self view] setNeedsLayout];
     [[self view] layoutIfNeeded];
     
-    [[[self navigationItem] leftBarButtonItem] setEnabled:!shown];
+    [_closeButtonItem setEnabled:!shown];
     [_trashButtonItem setEnabled:!shown];
-    
+    [[self navigationItem] setLeftBarButtonItem:shown ? _hideKeyboardButtonItem:_closeButtonItem];
     
     [UIView commitAnimations];
 }
