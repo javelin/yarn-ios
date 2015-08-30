@@ -276,7 +276,15 @@ static CGFloat GridSpacing = 140.0;
                       [_story deletePassage:[passageView passage]];
                       [passageView removeFromSuperview];
                       [_passageViews removeObjectForKey:[[passageView passage] name]];
-                      [self updatePassageLinks];
+                      NSInteger brokenLinks = [self updatePassageLinks];
+                      [_storyView setNeedsDisplay];
+                      if (brokenLinks) {
+                          AlertAndDismissInfo(_LS(@"Warning"),
+                                              [NSString stringWithFormat:_LS(@"Detected %d broken links"),
+                                               (int)brokenLinks],
+                                              1.5,
+                                              self);
+                      }
                   },
                   self);
 }
