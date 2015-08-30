@@ -162,7 +162,7 @@
     [[InputAccessoryView alloc] initWithHideHandler:nil];
     INIT_VIEW(UITextView, _textView, [self view]);
     [_textView setAutocapitalizationType:UITextAutocapitalizationTypeSentences];
-    [_textView setAutocorrectionType:UITextAutocorrectionTypeNo];
+    [_textView setAutocorrectionType:UITextAutocorrectionTypeDefault];
     [_textView setBackgroundColor:[[UIColor lightGrayColor] colorWithAlphaComponent:0.1]];
     [_textView setDelegate:self];
     [_textView setFont:[_titleField font]];
