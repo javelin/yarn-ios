@@ -198,10 +198,24 @@ static CGFloat GridSpacing = 140.0;
 }
 
 - (void)handleArchiveStory {
-    AlertAndDismissInfo(_LS(@"Archive Story"),
-                        _LS(@"Coming soon."),
-                        1.0,
-                        self);
+    [_story
+     saveAndCreateZip:YES
+     completion:^(Story *story, NSString *zipPath) {
+         NSURL *url = [NSURL fileURLWithPath:zipPath];
+         NSLog(@"Exporting %@", url);
+         _exportInteractionController =
+         [UIDocumentInteractionController interactionControllerWithURL:url];
+         [_exportInteractionController
+          presentOpenInMenuFromBarButtonItem:[[self navigationItem] leftBarButtonItem]
+          animated:YES];
+     }
+     error:^(NSError *error) {
+         AlertError([NSString stringWithFormat:_LS(@"Unable to archive the story.\n%@"),
+                     [error localizedDescription]],
+                    self);
+         [[self navigationController] popViewControllerAnimated:YES];
+         
+     }];
 }
 
 - (void)handleCloseStory {

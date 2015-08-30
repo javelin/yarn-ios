@@ -46,8 +46,15 @@
                            error:(NSError **)error;
 - (void)save:(void (^)(Story *story))completionHandler
        error:(void (^)(NSError *error))errorHandler;
+- (void)saveAndCreateZip:(BOOL)createZip
+              completion:(void (^)(Story *story, NSString *zipPath))completionHandler
+                   error:(void (^)(NSError *error))errorHandler;
 - (void)saveToPath:(NSString *)path
         completion:(void (^)(Story *story))completionHandler
+             error:(void (^)(NSError *error))errorHandler;
+- (void)saveToPath:(NSString *)path
+         createZip:(BOOL)createZip
+        completion:(void (^)(Story *story, NSString *zipPath))completionHandler
              error:(void (^)(NSError *error))errorHandler;
 
 @end

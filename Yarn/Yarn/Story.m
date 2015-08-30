@@ -9,6 +9,7 @@
 #import "Constants.h"
 #import "Passage.h"
 #import "Regex.h"
+#import "SSZipArchive.h"
 #import "Story.h"
 #import "Utils.h"
 
@@ -110,7 +111,7 @@ static NSString *_template = @"<tw-storydata name=\"%@\" startnode=\"%@\" creato
         return nil;
     }
     else {
-        [_passages setObject:passage forKey:passage.name];
+        [_passages setObject:passage forKey:[passage name]];
         return passage;
     }
 }
@@ -189,7 +190,7 @@ static NSString *_template = @"<tw-storydata name=\"%@\" startnode=\"%@\" creato
                             options:NSRegularExpressionDotMatchesLineSeparators | NSRegularExpressionUseUnixLineSeparators];
         NSString *storyData = [[regex matchOne:contents] group:0];
         NSXMLParser *parser = [[NSXMLParser alloc] initWithData:[storyData dataUsingEncoding:NSUTF8StringEncoding]];
-        parser.delegate = self;
+        [parser setDelegate:self];
         _elementStack = [NSMutableArray array];
         _passageId = 0;
         _completionHandler = completionHandler;
@@ -233,14 +234,14 @@ static NSString *_template = @"<tw-storydata name=\"%@\" startnode=\"%@\" creato
 - (NSArray *)passagesSortedByName {
     return [[_passages allValues] sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
         Passage *a = obj1, *b = obj2;
-        return [a.name compare:b.name];
+        return [[a name] compare:[b name]];
     }];
 }
 
 - (NSArray *)passagesSortedById {
     return [[_passages allValues] sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
         Passage *a = obj1, *b = obj2;
-        return [[NSNumber numberWithInteger:a.Id] compare:[NSNumber numberWithInteger:b.Id]];
+        return [[NSNumber numberWithInteger:[a Id]] compare:[NSNumber numberWithInteger:[b Id]]];
     }];
 }
 
@@ -249,7 +250,7 @@ static NSString *_template = @"<tw-storydata name=\"%@\" startnode=\"%@\" creato
                          options:(NSArray *)options
                            error:(NSError **)error {
     Passage *startPassage = [self getPassageWithName:_startPassage];
-    NSInteger startDbId = startId < 1 ? (startPassage ? startPassage.Id:-1):startId;
+    NSInteger startDbId = startId < 1 ? (startPassage ? [startPassage Id]:-1):startId;
     
     if (!startIsOptional) {
         if (startDbId < 1) {
@@ -276,7 +277,7 @@ static NSString *_template = @"<tw-storydata name=\"%@\" startnode=\"%@\" creato
         ++index;
     }
     
-    NSString *optStr = options.count ? [options componentsJoinedByString:@" "]:@"";
+    NSString *optStr = [options count] ? [options componentsJoinedByString:@" "]:@"";
     
     return [NSString stringWithFormat:_template,
             _name,
@@ -293,22 +294,42 @@ static NSString *_template = @"<tw-storydata name=\"%@\" startnode=\"%@\" creato
 
 - (void)save:(void (^)(Story *story))completionHandler
        error:(void (^)(NSError *error))errorHandler {
+    [self
+     saveAndCreateZip:NO
+     completion:^(Story *story, NSString *zipPath) {
+         completionHandler(story);
+     }
+     error:errorHandler];
+}
+
+- (void)saveAndCreateZip:(BOOL)createZip
+              completion:(void (^)(Story *story, NSString *zipPath))completionHandler
+                   error:(void (^)(NSError *error))errorHandler {
     [self _saveToPath:nil
-            createZip:NO
-           completion:^(Story *story, NSString *zipPath) {
-               completionHandler(story);
-           }
+            createZip:createZip
+           completion:completionHandler
                 error:errorHandler];
 }
 
 - (void)saveToPath:(NSString *)path
         completion:(void (^)(Story *story))completionHandler
              error:(void (^)(NSError *error))errorHandler {
+    [self
+     saveToPath:path
+     createZip:NO
+     completion:^(Story *story, NSString *zipPath) {
+         completionHandler(story);
+     }
+     error:errorHandler];
+}
+
+- (void)saveToPath:(NSString *)path
+         createZip:(BOOL)createZip
+        completion:(void (^)(Story *story, NSString *zipPath))completionHandler
+             error:(void (^)(NSError *error))errorHandler {
     [self _saveToPath:path
-            createZip:NO
-           completion:^(Story *story, NSString *zipPath) {
-               completionHandler(story);
-           }
+            createZip:createZip
+           completion:completionHandler
                 error:errorHandler];
 }
 
@@ -407,7 +428,78 @@ static NSString *_template = @"<tw-storydata name=\"%@\" startnode=\"%@\" creato
         }
         
         if (createZip) {
-            //! TO DO!
+            NSString *fname =
+            [_name stringByReplacingOccurrencesOfString:@"[^a-zA-Z0-9_\\- ]"
+                                             withString:@""
+                                                options:NSRegularExpressionSearch
+                                                  range:NSMakeRange(0, [_name length])];
+            fname = [fname stringByAppendingFormat:@"-%@", _ifId];
+            fname = [fname stringByAppendingPathExtension:@"export"];
+            fname = [fname stringByAppendingPathExtension:@"zip"];
+            NSString *zpath = [path stringByAppendingPathComponent:fname];
+            SSZipArchive *zipper = [[SSZipArchive alloc] initWithPath:zpath];
+            if (![zipper open]) {
+                if (errorHandler) {
+                    error = [NSError errorWithDomain:@"Story"
+                                                code:kCantOpenArchive
+                                            userInfo:@{NSLocalizedDescriptionKey:_LS(@"Unable to create archive file.")}];
+                    DISPATCH_ASYNC_MAIN(^{
+                        errorHandler(error);
+                    });
+                }
+                return;
+            }
+            if (![zipper writeFileAtPath:[path stringByAppendingPathComponent:@"story.html"] withFileName:@"story.html"]) {
+                if (errorHandler) {
+                    error = [NSError errorWithDomain:@"Story"
+                                                code:kCantWriteToArchive
+                                            userInfo:@{NSLocalizedDescriptionKey:_LS(@"Unable to write file to archive.")}];
+                    DISPATCH_ASYNC_MAIN(^{
+                        errorHandler(error);
+                    });
+                }
+                return;
+            }
+            NSString *mediaPath = [path stringByAppendingPathComponent:@"images"];
+            NSArray *images = [manager contentsOfDirectoryAtPath:mediaPath error:&error];
+            if (error) {
+                NSLog(@"%@", [error localizedDescription]);
+            }
+            else {
+                for (NSString *imagePath in images) {
+                    NSLog(@"Archiving %@", imagePath);
+                    if (![zipper writeFileAtPath:[mediaPath stringByAppendingPathComponent:imagePath]
+                                    withFileName:[[mediaPath lastPathComponent]
+                                                  stringByAppendingPathComponent:imagePath]]) {
+                        if (errorHandler) {
+                            error = [NSError errorWithDomain:@"Story"
+                                                        code:kCantWriteToArchive
+                                                    userInfo:@{NSLocalizedDescriptionKey:_LS(@"Unable to write file to archive.")}];
+                            DISPATCH_ASYNC_MAIN(^{
+                                errorHandler(error);
+                            });
+                        }
+                        return;
+                    }
+                }
+            }
+            if (![zipper close]) {
+                if (errorHandler) {
+                    error = [NSError errorWithDomain:@"Story"
+                                                code:kCantCloseArchive
+                                            userInfo:@{NSLocalizedDescriptionKey:_LS(@"Unable to close archive file.")}];
+                    DISPATCH_ASYNC_MAIN(^{
+                        errorHandler(error);
+                    });
+                }
+                return;
+            }
+            path = zpath;
+            if (completionHandler) {
+                DISPATCH_ASYNC_MAIN(^{
+                    completionHandler(self, zpath);
+                });
+            }
         }
         else {
             if (completionHandler) {
@@ -448,16 +540,16 @@ static NSString *_template = @"<tw-storydata name=\"%@\" startnode=\"%@\" creato
         NSArray *pos = [[attributeDict valueForKey:@"position"] componentsSeparatedByString:@","];
         [_currentPassage setLeft:[[pos objectAtIndex:0] floatValue]];
         [_currentPassage setTop:[[pos objectAtIndex:1] floatValue]];
-        if (_currentPassage.Id == _startId) {
+        if ([_currentPassage Id] == _startId) {
             _startPassage = [_currentPassage name];
         }
-        NSLog(@"%@ - %d", _currentPassage.name, (int)[_currentPassage Id]);
+        NSLog(@"%@ - %d", [_currentPassage name], (int)[_currentPassage Id]);
     }
 }
 
 - (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName {
     NSLog(@"End: %@", elementName);
-    while (_elementStack.count && ![_elementStack.lastObject isEqualToString:elementName]) {
+    while ([_elementStack count] && ![[_elementStack lastObject] isEqualToString:elementName]) {
         [_elementStack removeLastObject];
     }
     [_elementStack removeLastObject];
@@ -478,25 +570,25 @@ static NSString *_template = @"<tw-storydata name=\"%@\" startnode=\"%@\" creato
 }
 
 - (void)parser:(NSXMLParser *)parser foundCDATA:(NSData *)CDATABlock {
-    if ([_elementStack.lastObject isEqualToString:@"script"]) {
+    if ([[_elementStack lastObject] isEqualToString:@"script"]) {
         _script = [CDATABlock UTF8String];
     }
-    else if ([_elementStack.lastObject isEqualToString:@"stylesheet"]) {
+    else if ([[_elementStack lastObject] isEqualToString:@"stylesheet"]) {
         _stylesheet = [CDATABlock UTF8String];
     }
-    else if ([_elementStack.lastObject isEqualToString:@"tw-passagedata"]) {
-        _currentPassage.text = [CDATABlock UTF8String];
+    else if ([[_elementStack lastObject] isEqualToString:@"tw-passagedata"]) {
+        [_currentPassage setText:[CDATABlock UTF8String]];
     }
 }
 
 - (void)parser:(NSXMLParser *)parser foundCharacters:(NSString *)string {
-    if ([_elementStack.lastObject isEqualToString:@"script"]) {
+    if ([[_elementStack lastObject] isEqualToString:@"script"]) {
         _script = [_script stringByAppendingString:string];
     }
-    else if ([_elementStack.lastObject isEqualToString:@"stylesheet"]) {
+    else if ([[_elementStack lastObject] isEqualToString:@"stylesheet"]) {
         _stylesheet = [_stylesheet stringByAppendingString:string];
     }
-    else if ([_elementStack.lastObject isEqualToString:@"tw-passagedata"]) {
+    else if ([[_elementStack lastObject] isEqualToString:@"tw-passagedata"]) {
         [_currentPassage setText:[[_currentPassage text] stringByAppendingString:string]];
     }
 }
