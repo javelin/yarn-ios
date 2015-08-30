@@ -120,7 +120,7 @@
 }
 
 + (CGFloat)minButtonWidth {
-    return IS_IPAD() ? 50:25;
+    return IS_IPAD() ? 40:25;
 }
 
 @end
