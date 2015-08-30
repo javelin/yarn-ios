@@ -364,7 +364,9 @@
     
     [_closeButtonItem setEnabled:!shown];
     [_trashButtonItem setEnabled:!shown];
-    [[self navigationItem] setLeftBarButtonItem:shown ? _hideKeyboardButtonItem:_closeButtonItem];
+    if (!IS_IPAD()) {
+        [[self navigationItem] setLeftBarButtonItem:shown ? _hideKeyboardButtonItem:_closeButtonItem];
+    }
     
     [UIView commitAnimations];
 }
