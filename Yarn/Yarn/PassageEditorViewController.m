@@ -18,6 +18,7 @@
 @property (nonatomic, strong) UITextField *tagsField;
 @property (nonatomic, strong) UITextView *textView;
 
+@property (nonatomic, strong) UIBarButtonItem* trashButtonItem;
 @property (nonatomic, strong) UIBarButtonItem* imageLinkButtonItem;
 @property (nonatomic, strong) UIBarButtonItem* redoButtonItem;
 @property (nonatomic, strong) UIBarButtonItem* undoButtonItem;
@@ -46,7 +47,7 @@
                                         action:@selector(handleDoneEditing)];
         [[self navigationItem] setLeftBarButtonItem:closeBarButtonItem];
         
-        UIBarButtonItem *trashButtonItem =
+        _trashButtonItem =
         [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash
                                                       target:self
                                                       action:@selector(handleDeleteThisPassage)];
@@ -73,7 +74,7 @@
         [[self navigationItem] setRightBarButtonItems:@[_redoButtonItem,
                                                         _undoButtonItem,
                                                         _imageLinkButtonItem,
-                                                        trashButtonItem]];
+                                                        _trashButtonItem]];
         
         if (IS_IPAD()) {
             [self setTitle:_LS(@"Edit Passage")];
@@ -351,6 +352,10 @@
     [_bottomConstraint setConstant:shown ? -CGRectGetHeight(keyboardFrame) - 10:-10];
     [[self view] setNeedsLayout];
     [[self view] layoutIfNeeded];
+    
+    [[[self navigationItem] leftBarButtonItem] setEnabled:!shown];
+    [_trashButtonItem setEnabled:!shown];
+    
     
     [UIView commitAnimations];
 }
