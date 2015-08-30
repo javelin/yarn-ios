@@ -1,0 +1,3 @@
+[submodule "ssziparchive"]
+	path = ssziparchive
+	url = https://github.com/iosphere/ssziparchive.git
