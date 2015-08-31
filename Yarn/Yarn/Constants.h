@@ -11,6 +11,7 @@
 extern const NSString *kBundleTwineVersionKey;
 extern const NSString *kBundleYarnSourceURL;
 extern const NSString *kBundleMyEmail;
+const  NSTimeInterval  kYarnDefaultAutosaveInterval = 300.0; // five minutes
 extern const NSString *kYarnDefaultProofingFormat;
 extern const NSString *kYarnDefaultStoryFormat;
 extern const NSString *kYarnKeyDefaultStoryFormat;

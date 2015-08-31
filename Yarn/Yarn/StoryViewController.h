@@ -6,13 +6,13 @@
 //  Copyright (c) 2015 Mark Jundo Documento. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import "AutosavingViewController.h"
 #import "PassageView.h"
 #import "PassageEditorViewController.h"
 #import "Story.h"
 #import "StoryFormat.h"
 
-@interface StoryViewController : UIViewController <PassageViewDelegate, PassageEditorViewControllerDelegate, UIScrollViewDelegate>
+@interface StoryViewController : AutosavingViewController <PassageViewDelegate, PassageEditorViewControllerDelegate, UIScrollViewDelegate>
 
 @property (nonatomic, readonly) Story *story;
 @property (nonatomic, readonly) NSDictionary *passageViews;

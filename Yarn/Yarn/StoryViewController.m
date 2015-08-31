@@ -192,6 +192,23 @@ static CGFloat GridSpacing = 140.0;
     [self setTitle:@""];
 }
 
+#pragma mark Autosave
+- (void)autosave {
+    [_story
+     save:^(Story *story) {
+         [super autosave];
+     }
+     error:^(NSError *error) {
+         AlertError([NSString stringWithFormat:_LS(@"Unable to save the story.\n%@"),
+                     [error localizedDescription]],
+                    self);
+     }];
+}
+
+- (NSTimeInterval)autosaveInterval {
+    return kYarnDefaultAutosaveInterval;
+}
+
 #pragma mark Handlers
 - (void)handleArchiveProofingCopy {
     [self publish:YES createArchive:YES];
@@ -285,6 +302,7 @@ static CGFloat GridSpacing = 140.0;
                                               1.5,
                                               self);
                       }
+                      [self startAutosaveTimer];
                   },
                   self);
 }
@@ -752,8 +770,9 @@ static CGFloat GridSpacing = 140.0;
     }
     
     [self adjustScrollContentSize:passageView];
-    [self.storyView setNeedsDisplay];
-    [self.scrollView scrollRectToVisible:[passageView frame] animated:YES];
+    [_storyView setNeedsDisplay];
+    [_scrollView scrollRectToVisible:[passageView frame] animated:YES];
+    [self startAutosaveTimer];
 }
 
 - (void)showPassageViewMenu:(PassageView *)passageView {
