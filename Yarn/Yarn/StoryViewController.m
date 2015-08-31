@@ -235,6 +235,7 @@ static CGFloat GridSpacing = 140.0;
 }
 
 - (void)handleCloseStory {
+    [self invalidateAutosaveTimer];
     [_story
      save:^(Story *story) {
          [[self navigationController] popViewControllerAnimated:YES];
@@ -307,6 +308,7 @@ static CGFloat GridSpacing = 140.0;
 }
 
 - (void)handleEditPassageIn:(PassageView *)passageView {
+    [self invalidateAutosaveTimer];
     PassageEditorViewController *passageEditorViewController =
     [[PassageEditorViewController alloc] initWithPassageView:passageView
                                                     delegate:self];
