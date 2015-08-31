@@ -11,8 +11,18 @@
 const NSString *kBundleTwineVersionKey = @"com.mjdocumento.twine.version";
 const NSString *kBundleYarnSourceURL = @"com.mjdocumento.yarn.source.url";
 const NSString *kBundleMyEmail = @"com.mjdocumento.my.email";
+const NSTimeInterval kYarnDefaultAutosaveInterval = 300.0; // five minutes
 const NSString *kYarnDefaultProofingFormat = @"Harlowe";
 const NSString *kYarnDefaultStoryFormat = @"Paperthin";
 const NSString *kYarnKeyDefaultStoryFormat = @"com.mjdocumento.default.story.format";
 const NSString *kYarnKeyProofingFormat = @"com.mjdocumento.proofing.format";
 const NSString *kYarnKeySnapToGrid = @"com.mjdocumento.snap.to.grid";
+
+const NSInteger kDuplicatePassageName = -1;
+const NSInteger kNoPath = -2;
+const NSInteger kNoStartingPoint = -3;
+const NSInteger kStartingPointNonExistent = -4;
+const NSInteger kInvalidPath = -5;
+const NSInteger kCantOpenArchive = -6;
+const NSInteger kCantWriteToArchive = -7;
+const NSInteger kCantCloseArchive = -8;

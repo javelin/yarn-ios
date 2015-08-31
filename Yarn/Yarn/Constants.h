@@ -11,18 +11,18 @@
 extern const NSString *kBundleTwineVersionKey;
 extern const NSString *kBundleYarnSourceURL;
 extern const NSString *kBundleMyEmail;
-const  NSTimeInterval  kYarnDefaultAutosaveInterval = 300.0; // five minutes
+extern const NSTimeInterval kYarnDefaultAutosaveInterval;
 extern const NSString *kYarnDefaultProofingFormat;
 extern const NSString *kYarnDefaultStoryFormat;
 extern const NSString *kYarnKeyDefaultStoryFormat;
 extern const NSString *kYarnKeyProofingFormat;
 extern const NSString *kYarnKeySnapToGrid;
 
-const NSInteger kDuplicatePassageName = -1;
-const NSInteger kNoPath = -2;
-const NSInteger kNoStartingPoint = -3;
-const NSInteger kStartingPointNonExistent = -4;
-const NSInteger kInvalidPath = -5;
-const NSInteger kCantOpenArchive = -6;
-const NSInteger kCantWriteToArchive = -7;
-const NSInteger kCantCloseArchive = -8;
+extern const NSInteger kDuplicatePassageName;
+extern const NSInteger kNoPath;
+extern const NSInteger kNoStartingPoint;
+extern const NSInteger kStartingPointNonExistent;
+extern const NSInteger kInvalidPath;
+extern const NSInteger kCantOpenArchive;
+extern const NSInteger kCantWriteToArchive;
+extern const NSInteger kCantCloseArchive;
