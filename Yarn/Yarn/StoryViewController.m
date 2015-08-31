@@ -268,10 +268,24 @@ static CGFloat GridSpacing = 140.0;
          [UIAlertAction actionWithTitle:_LS(@"Create")
                                   style:UIAlertActionStyleDefault
                                 handler:^(UIAlertAction *action) {
-                                    
+                                    UITextField *textField = [[_createPassageController textFields] firstObject];
+                                    NSString *name = TRIM([textField text]);
+                                    if ([[_passageViews allKeys] containsObject:name]) {
+                                        AlertError([NSString stringWithFormat:_LS(@"A passage named \"%@\" already exists."), name],
+                                                   self);
+                                    }
+                                    else if ([name notEmpty]) {
+                                        Passage *passage = [Passage passageInStory:_story named:name];
+                                        PassageView *passageView = [self addNewPassageView:passage];
+                                        [self positionPassageView:passageView];
+                                        [self handleEditPassageIn:passageView];
+                                    }
+                                    else {
+                                        AlertError(@"You need to provide the passage with a name.",
+                                                   self);
+                                    }
                                 }]];
     }
-    
     UITextField *textField = [[_createPassageController textFields] firstObject];
     [textField setText:@""];
     [self presentViewController:_createPassageController
