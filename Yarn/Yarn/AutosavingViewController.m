@@ -11,6 +11,8 @@
 
 @interface AutosavingViewController ()
 
+@property (nonatomic, strong) UILabel *autosaveLabel;
+
 @end
 
 @implementation AutosavingViewController
@@ -19,6 +21,19 @@
     self = [super init];
     if (self) {
         _autosaveTimer = nil;
+        [self setView:[UIView new]];
+        INIT_VIEW(UILabel, _autosaveLabel, [self view]);
+        [_autosaveLabel setBackgroundColor:[[UIColor blackColor] colorWithAlphaComponent:0.7]];
+        [_autosaveLabel setFont:[UIFont systemFontOfSize:10.0]];
+        [_autosaveLabel setHidden:YES];
+        [_autosaveLabel setText:_LS(@"Autosaving...")];
+        [_autosaveLabel setTextAlignment:NSTextAlignmentCenter];
+        [_autosaveLabel setTextColor:[UIColor whiteColor]];
+        [_autosaveLabel sizeToFit];
+        CONSTRAINT_EQ([self view], _autosaveLabel, Top, [self view], Top, 1.0, 0.0);
+        CONSTRAINT_EQ([self view], _autosaveLabel, Left, [self view], Left, 1.0, 0.0);
+        CONSTRAINT_EQ([self view], _autosaveLabel, Right, [self view], Right, 1.0, 0.0);
+        CONSTRAINT_EQ([self view], _autosaveLabel, Height, nil, Height, 1.0, CGRectGetHeight([_autosaveLabel frame]));
     }
     
     return self;
@@ -30,7 +45,10 @@
 }
 
 - (void)autosave {
-    AlertAndDismissInfo(nil, _LS(@"Autosaving..."), 0.5, self);
+    [self showAutosaveLabel:YES];
+    DispatchMainAfter(1.5, ^{
+        [self showAutosaveLabel:NO];
+    });
 }
 
 - (NSTimeInterval)autosaveInterval {
@@ -45,6 +63,13 @@
     if (_autosaveTimer) {
         [_autosaveTimer invalidate];
         _autosaveTimer = nil;
+    }
+}
+
+- (void)showAutosaveLabel:(BOOL)show {
+    [_autosaveLabel setHidden:!show];
+    if (show) {
+        [[self view] bringSubviewToFront:_autosaveLabel];
     }
 }
 

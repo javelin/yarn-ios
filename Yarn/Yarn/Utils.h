@@ -18,6 +18,7 @@ typedef void (^ErrorBlock)(NSError *error);
 
 void DispatchAsync(dispatch_block_t block);
 void DispatchAsyncMain(dispatch_block_t block);
+void DispatchMainAfter(NSTimeInterval interval, dispatch_block_t block);
 
 #define BUNDLE_VALUE(key) [[[NSBundle mainBundle] infoDictionary] objectForKey:key]
 

@@ -120,8 +120,6 @@ static CGFloat GridSpacing = 140.0;
 }
 
 - (void)createViews {
-    [self setView:[UIView new]];
-    
     _storyView = [[StoryView alloc] initWithController:self];
     _scrollView = [[UIScrollView alloc] init];
     [_scrollView setBackgroundColor:[UIColor lightGrayColor]];
@@ -194,9 +192,10 @@ static CGFloat GridSpacing = 140.0;
 
 #pragma mark Autosave
 - (void)autosave {
+    [super autosave];
     [_story
      save:^(Story *story) {
-         [super autosave];
+         
      }
      error:^(NSError *error) {
          AlertError([NSString stringWithFormat:_LS(@"Unable to save the story.\n%@"),

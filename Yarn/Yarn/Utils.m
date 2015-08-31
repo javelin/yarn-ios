@@ -42,6 +42,12 @@ void DispatchAsyncMain(dispatch_block_t block) {
     dispatch_async(dispatch_get_main_queue(), block);
 }
 
+void DispatchMainAfter(NSTimeInterval interval, dispatch_block_t block) {
+    dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW,
+                                          (dispatch_time_t)round(interval * (NSTimeInterval)NSEC_PER_SEC));
+    dispatch_after(delay, dispatch_get_main_queue(), block);
+}
+
 NSString *SanitizeString(NSString *s, BOOL showLinks) {
     static Regex *regex1 = nil, *regex2 = nil;
     if (!regex1) {

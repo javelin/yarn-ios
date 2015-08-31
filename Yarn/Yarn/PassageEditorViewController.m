@@ -120,7 +120,6 @@
 }
 
 - (void)createViews {
-    [self setView:[UIView new]];
     [[self view] setBackgroundColor:[UIColor whiteColor]];
     
     INIT_VIEW(UILabel, _titleLabel, [self view]);
