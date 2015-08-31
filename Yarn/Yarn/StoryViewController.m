@@ -6,6 +6,7 @@
 //  Copyright (c) 2015 Mark Jundo Documento. All rights reserved.
 //
 
+#import "AppDelegate.h"
 #import "Constants.h"
 #import "StorySettingsViewController.h"
 #import "StoryView.h"
@@ -114,6 +115,9 @@ static CGFloat GridSpacing = 140.0;
         
         _mediaPickerViewController =
         [[MediaPickerViewController alloc] initWithIFId:[_story ifId]];
+        
+        [(AppDelegate *)[[UIApplication sharedApplication] delegate]
+         setDelegate:self];
     }
     
     return self;
@@ -249,6 +253,8 @@ static CGFloat GridSpacing = 140.0;
                     self);
          [[self navigationController] popViewControllerAnimated:YES];
      }];
+    [(AppDelegate *)[[UIApplication sharedApplication] delegate]
+     setDelegate:nil];
 }
 
 - (void)handleCreateNewPassage {
@@ -326,6 +332,8 @@ static CGFloat GridSpacing = 140.0;
     PassageEditorViewController *passageEditorViewController =
     [[PassageEditorViewController alloc] initWithPassageView:passageView
                                                     delegate:self];
+    [(AppDelegate *)[[UIApplication sharedApplication] delegate]
+     setDelegate:passageEditorViewController];
     [[self navigationController] pushViewController:passageEditorViewController
                                            animated:YES];
 }
@@ -695,6 +703,9 @@ static CGFloat GridSpacing = 140.0;
     error:^(NSError *error) {
         
     }];
+    
+    [(AppDelegate *)[[UIApplication sharedApplication] delegate]
+     setDelegate:self];
     
     NSInteger brokenLinks = [self updatePassageLinks];
     [[self view] setNeedsDisplay];

@@ -86,4 +86,10 @@
     }
 }
 
+#pragma mark SaveDataDelegate
+- (void)saveData {
+    [self invalidateAutosaveTimer];
+    [self autosave];
+}
+
 @end
