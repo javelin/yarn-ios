@@ -18,6 +18,10 @@ const NSString *kYarnKeyDefaultStoryFormat = @"com.mjdocumento.default.story.for
 const NSString *kYarnKeyProofingFormat = @"com.mjdocumento.proofing.format";
 const NSString *kYarnKeySnapToGrid = @"com.mjdocumento.snap.to.grid";
 
+const NSString *kYarnStorySaveDir = @"stories";
+const NSString *kYarnStoryFormatSaveDir = @"formats";
+const NSString *kYarnStoryProofingFormatSaveDir = @"proofing-formats";
+
 const NSInteger kDuplicatePassageName = -1;
 const NSInteger kNoPath = -2;
 const NSInteger kNoStartingPoint = -3;
