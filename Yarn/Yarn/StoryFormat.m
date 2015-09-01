@@ -212,7 +212,7 @@ typedef void (^StoryFormatCompletionBlock)(StoryFormat *storyFormat);
          createZip:(BOOL)createZip
         completion:(void (^)(Story *story, NSString *path))completionHandler
              error:(void (^)(NSError *error))errorHandler {
-    DISPATCH_ASYNC(^{
+    DispatchAsync(^{
         NSString *path = pathOrNil;
         NSFileManager *manager = [NSFileManager defaultManager];
         if (!path) {
@@ -269,24 +269,24 @@ typedef void (^StoryFormatCompletionBlock)(StoryFormat *storyFormat);
                     error = [NSError errorWithDomain:@"Story"
                                                 code:kCantOpenArchive
                                             userInfo:@{NSLocalizedDescriptionKey:_LS(@"Unable to create archive file.")}];
-                    DISPATCH_ASYNC_MAIN(^{
+                    DispatchAsyncMain(^{
                         errorHandler(error);
                     });
                 }
                 return;
             }
-            if (![zipper writeFileAtPath:path withFileName:@"story.html"]) {
+            if (![zipper writeFileAtPath:path withFileName:[self isProofing] ? @"proof.html":@"game.html"]) {
                 if (errorHandler) {
                     error = [NSError errorWithDomain:@"Story"
                                                 code:kCantWriteToArchive
                                             userInfo:@{NSLocalizedDescriptionKey:_LS(@"Unable to write file to archive.")}];
-                    DISPATCH_ASYNC_MAIN(^{
+                    DispatchAsyncMain(^{
                         errorHandler(error);
                     });
                 }
                 return;
             }
-            NSString *mediaPath = [path stringByAppendingPathComponent:@"images"];
+            NSString *mediaPath = [[story path] stringByAppendingPathComponent:@"images"];
             NSArray *images = [manager contentsOfDirectoryAtPath:mediaPath error:&error];
             if (error) {
                 NSLog(@"%@", [error localizedDescription]);
@@ -301,7 +301,7 @@ typedef void (^StoryFormatCompletionBlock)(StoryFormat *storyFormat);
                                             error = [NSError errorWithDomain:@"Story"
                                                                         code:kCantWriteToArchive
                                                                     userInfo:@{NSLocalizedDescriptionKey:_LS(@"Unable to write file to archive.")}];
-                                            DISPATCH_ASYNC_MAIN(^{
+                                            DispatchAsyncMain(^{
                                                 errorHandler(error);
                                             });
                                         }
@@ -314,7 +314,7 @@ typedef void (^StoryFormatCompletionBlock)(StoryFormat *storyFormat);
                     error = [NSError errorWithDomain:@"Story"
                                                 code:kCantCloseArchive
                                             userInfo:@{NSLocalizedDescriptionKey:_LS(@"Unable to close archive file.")}];
-                    DISPATCH_ASYNC_MAIN(^{
+                    DispatchAsyncMain(^{
                         errorHandler(error);
                     });
                 }
@@ -327,7 +327,7 @@ typedef void (^StoryFormatCompletionBlock)(StoryFormat *storyFormat);
         }
         
         if (completionHandler) {
-            DISPATCH_ASYNC_MAIN(^{
+            DispatchAsyncMain(^{
                 completionHandler(story, path);
             });
         }
