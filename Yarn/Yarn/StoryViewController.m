@@ -6,7 +6,6 @@
 //  Copyright (c) 2015 Mark Jundo Documento. All rights reserved.
 //
 
-#import "AppDelegate.h"
 #import "Constants.h"
 #import "StorySettingsViewController.h"
 #import "StoryView.h"
@@ -24,13 +23,15 @@
 
 @property (nonatomic, strong) StoryView *storyView;
 
+@property (nonatomic, strong) MediaPickerViewController *mediaPickerViewController;
+@property (nonatomic, strong) PassageEditorViewController *passageEditorViewController;
+
 @property (nonatomic, strong) UIAlertController *createPassageController;
 @property (nonatomic, strong) UIAlertController *menuController;
 
 @property (nonatomic, strong) UIDocumentInteractionController *exportInteractionController;
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) UITapGestureRecognizer *tapGestureRecognizer;
-@property (nonatomic, strong) MediaPickerViewController *mediaPickerViewController;
 
 @end
 
@@ -115,9 +116,6 @@ static CGFloat GridSpacing = 140.0;
         
         _mediaPickerViewController =
         [[MediaPickerViewController alloc] initWithIFId:[_story ifId]];
-        
-        [(AppDelegate *)[[UIApplication sharedApplication] delegate]
-         setDelegate:self];
     }
     
     return self;
@@ -212,6 +210,15 @@ static CGFloat GridSpacing = 140.0;
     return kYarnDefaultAutosaveInterval;
 }
 
+- (void)saveData {
+    if (_passageEditorViewController) {
+        [_passageEditorViewController saveData];
+    }
+    else {
+        [super saveData];
+    }
+}
+
 #pragma mark Handlers
 - (void)handleArchiveProofingCopy {
     [self publish:YES createArchive:YES];
@@ -253,8 +260,7 @@ static CGFloat GridSpacing = 140.0;
                     self);
          [[self navigationController] popViewControllerAnimated:YES];
      }];
-    [(AppDelegate *)[[UIApplication sharedApplication] delegate]
-     setDelegate:nil];
+    _passageEditorViewController = nil;
 }
 
 - (void)handleCreateNewPassage {
@@ -329,12 +335,10 @@ static CGFloat GridSpacing = 140.0;
 
 - (void)handleEditPassageIn:(PassageView *)passageView {
     [self invalidateAutosaveTimer];
-    PassageEditorViewController *passageEditorViewController =
+    _passageEditorViewController =
     [[PassageEditorViewController alloc] initWithPassageView:passageView
                                                     delegate:self];
-    [(AppDelegate *)[[UIApplication sharedApplication] delegate]
-     setDelegate:passageEditorViewController];
-    [[self navigationController] pushViewController:passageEditorViewController
+    [[self navigationController] pushViewController:_passageEditorViewController
                                            animated:YES];
 }
 
@@ -703,9 +707,6 @@ static CGFloat GridSpacing = 140.0;
     error:^(NSError *error) {
         
     }];
-    
-    [(AppDelegate *)[[UIApplication sharedApplication] delegate]
-     setDelegate:self];
     
     NSInteger brokenLinks = [self updatePassageLinks];
     [[self view] setNeedsDisplay];

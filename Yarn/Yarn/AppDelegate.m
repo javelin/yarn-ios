@@ -60,6 +60,14 @@
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
 
+- (BOOL)application:(nonnull UIApplication *)application
+            openURL:(nonnull NSURL *)url
+  sourceApplication:(nullable NSString *)sourceApplication
+         annotation:(nonnull id)annotation {
+    NSLog(@"Opening %@", url);
+    return [_delegate importData:url];
+}
+
 - (void)setDefaultValue:(NSObject *)object forKey:(NSString *)key {
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     NSObject *storedObject = [userDefaults objectForKey:key];

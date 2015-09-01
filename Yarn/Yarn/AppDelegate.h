@@ -8,8 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
-@protocol SaveDataDelegate <NSObject>
+@protocol AppDataDelegate <NSObject>
 
+- (BOOL)importData:(NSURL *)url;
 - (void)saveData;
 
 @end
@@ -17,7 +18,7 @@
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
-@property (nonatomic, strong) id<SaveDataDelegate> delegate;
+@property (nonatomic, strong) id<AppDataDelegate> delegate;
 
 @end
 

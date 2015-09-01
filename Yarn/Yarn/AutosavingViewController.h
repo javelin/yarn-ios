@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "AppDelegate.h"
 
-@interface AutosavingViewController : UIViewController <SaveDataDelegate>
+@interface AutosavingViewController : UIViewController
 
 @property (nonatomic, strong) NSTimer *autosaveTimer;
 

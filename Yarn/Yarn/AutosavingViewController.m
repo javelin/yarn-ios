@@ -66,6 +66,11 @@
     }
 }
 
+- (void)saveData {
+    [self invalidateAutosaveTimer];
+    [self autosave];
+}
+
 - (void)showAutosaveLabel:(BOOL)show {
     [_autosaveLabel setHidden:!show];
     if (show) {
@@ -84,12 +89,6 @@
                                        userInfo:nil
                                         repeats:NO];
     }
-}
-
-#pragma mark SaveDataDelegate
-- (void)saveData {
-    [self invalidateAutosaveTimer];
-    [self autosave];
 }
 
 @end

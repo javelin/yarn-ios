@@ -112,6 +112,14 @@ UIAlertController *AlertQuestion(NSString *title,
                                  BOOL destructive,
                                  void (^handler)(UIAlertAction *action),
                                  UIViewController *presenter);
+UIAlertController *AlertQuestionWithCancelHandler(NSString *title,
+                                                  NSString *message,
+                                                  NSString *cancelTitle,
+                                                  void (^cancelHandler)(UIAlertAction *action),
+                                                  NSString *actionTitle,
+                                                  BOOL destructive,
+                                                  void (^handler)(UIAlertAction *action),
+                                                  UIViewController *presenter);
 
 void CreateBackButtonOn(UINavigationItem* navigationItem, id target, SEL action);
 UIButton* CreateBackButton();
