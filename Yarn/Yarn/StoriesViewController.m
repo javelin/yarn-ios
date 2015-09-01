@@ -126,252 +126,419 @@ typedef enum StorySortMethod {
     else {
         SHOW_WAIT();
         DispatchAsync(^{
-            NSString *importPath = [AppDirectory() stringByAppendingPathComponent:@"Import"];
-            BOOL isDir, exists = [fileManager fileExistsAtPath:importPath isDirectory:&isDir];
-            NSError *error = nil;
-            if (exists) {
-                if (!isDir) {
-                    [fileManager removeItemAtPath:importPath error:&error];
-                    if (error) {
-                        NSLog(@"%@", error);
-                    }
-                    exists = NO;
-                }
-            }
-            if (!exists) {
-                error = nil;
-                [fileManager createDirectoryAtPath:importPath
-                       withIntermediateDirectories:NO
-                                        attributes:nil
-                                             error:&error];
-                if (error) {
-                    NSLog(@"%@", error);
-                    removeUrl();
-                    DispatchAsyncMain(^{
-                        HIDE_WAIT();
-                        AlertError(@"Unable to create temporary directory.",
-                                   self);
-                    });
-                }
-            }
-            NSString *tempPath = [importPath stringByAppendingPathComponent:[[NSUUID new] UUIDString]];
-            error = nil;
-            NSLog(@"Creating temporary directory %@", tempPath);
-            [fileManager createDirectoryAtPath:tempPath
-                   withIntermediateDirectories:NO
-                                    attributes:nil
-                                         error:&error];
-            if (error) {
-                NSLog(@"%@", error);
-                removeUrl();
-                DispatchAsyncMain(^{
-                    HIDE_WAIT();
-                    AlertError(@"Unable to create temporary directory.",
-                               self);
-                });
-            }
-            
-            void (^removeTempFiles)() = ^() {
-                NSError *error = nil;
-                removeUrl();
-                [fileManager removeItemAtPath:tempPath error:&error];
-                if (error) {
-                    NSLog(@"%@", error);
-                }
-            };
-            
-            [SSZipArchive unzipFileAtPath:[url path]
-                            toDestination:tempPath
-                                overwrite:YES
-                                 password:nil
-                                    error:&error];
-            if (error) {
-                NSLog(@"%@", error);
-                removeTempFiles();
-                DispatchAsyncMain(^{
-                    HIDE_WAIT();
-                    AlertError(@"Unable to extract archive contents.",
-                               self);
-                });
+            if ([[url pathExtension] isEqualToString:@"zip"]) {
+                [self importZip:url];
             }
             else {
-                error = nil;
-                
-                NSString *htmlPath = [tempPath stringByAppendingPathComponent:@"story.html"];
-                if (![fileManager fileExistsAtPath:htmlPath]) {
-                    htmlPath = [tempPath stringByAppendingPathComponent:@"game.html"];
-                    if (![fileManager fileExistsAtPath:htmlPath]) {
-                        htmlPath = [tempPath stringByAppendingPathComponent:@"proof.html"];
-                        if (![fileManager fileExistsAtPath:htmlPath]) {
-                            // Nada!
-                            removeTempFiles();
-                            DispatchAsyncMain(^{
-                                HIDE_WAIT();
-                                AlertError(@"Missing story.html file.",
-                                           self);
-                            });
-                            return;
-                        }
-                    }
-                    [fileManager moveItemAtPath:htmlPath
-                                         toPath:[tempPath stringByAppendingPathComponent:@"story.html"]
-                                          error:&error];
-                    if (error) {
-                        NSLog(@"%@", error);
-                        removeTempFiles();
-                        DispatchAsyncMain(^{
-                            HIDE_WAIT();
-                            AlertError(@"Missing or corrupt story.html file.",
-                                       self);
-                        });
-                        return;
-                    }
-                }
-                
-                Story* story = [Story new];
-                [story setPath:tempPath];
-                [story
-                 load:^(Story *story) {
-                     void (^writeToSaveDir)(Story *_oldStory) = ^(Story *_oldStory){
-                         NSString *savePath = [[self saveDir] stringByAppendingPathComponent:[story ifId]];
-                         NSString *imagesPath = [savePath stringByAppendingPathComponent:@"images"];
-                         
-                         NSError *error = nil;
-                         if ([fileManager fileExistsAtPath:savePath]) {
-                             [fileManager removeItemAtPath:savePath error:&error];
-                             if (error) {
-                                 NSLog(@"%@", error);
-                                 removeTempFiles();
-                                 DispatchAsyncMain(^{
-                                     HIDE_WAIT();
-                                     AlertError(_LS(@"Unable to import archive. Failed to overwrite old save directory."),
-                                                self);
-                                 });
-                                 return;
-                             }
-                         }
-                         
-                         [fileManager createDirectoryAtPath:imagesPath
-                                withIntermediateDirectories:YES
-                                                 attributes:nil
-                                                      error:&error];
-                         if (error) {
-                             NSLog(@"%@", error);
-                             removeTempFiles();
-                             DispatchAsyncMain(^{
-                                 HIDE_WAIT();
-                                 if (_oldStory) {
-                                     [_stories removeObject:_oldStory];
-                                     [[self tableView] reloadData];
-                                 }
-                                 AlertError(_LS(@"Unable to import archive. Failed to create save directory."),
-                                            self);
-                             });
-                             return;
-                         }
-                         
-                         NSString *tempImagesPath = [tempPath stringByAppendingPathComponent:@"images"];
-                         NSArray *images = [fileManager contentsOfDirectoryAtPath:tempImagesPath error:&error];
-                         int failedTransfers = 0;
-                         if (error) {
-                             NSLog(@"%@", error);
-                         }
-                         else {
-                             for (NSString *filename in images) {
-                                 error = nil;
-                                 [fileManager moveItemAtPath:[tempImagesPath stringByAppendingPathComponent:filename]
-                                                      toPath:[imagesPath stringByAppendingPathComponent:filename]
-                                                       error:&error];
-                                 if (error) {
-                                     NSLog(@"%@", error);
-                                     failedTransfers++;
-                                 }
-                             }
-                         }
-                         
-                         [story setPath:savePath];
-                         [story setLastUpdate:[NSDate date]];
-                         [story
-                          save:^(Story *story) {
-                              removeTempFiles();
-                              if (_oldStory) {
-                                  [_stories removeObject:_oldStory];
-                              }
-                              [_stories addObject:story];
-                              [self sortObjects];
-                              DispatchAsyncMain(^{
-                                  [[self tableView] reloadData];
-                                  HIDE_WAIT();
-                                  NSString *msg = failedTransfers ?
-                                  [NSString stringWithFormat:_LS(@"Story successfully imported, but failed to transfer %d image files."), failedTransfers]:
-                                  _LS(@"Story successfully imported.");
-                                  AlertInfo(_LS(@"Import"),
-                                            msg,
-                                            _LS(@"Close"),
-                                            self);
-                              });
-                          }
-                          error:^(NSError *error) {
-                              NSLog(@"%@", error);
-                              removeTempFiles();
-                              DispatchAsyncMain(^{
-                                  if (_oldStory) {
-                                      [_stories removeObject:_oldStory];
-                                      [[self tableView] reloadData];
-                                  }
-                                  HIDE_WAIT();
-                                  AlertError(_LS(@"Unable to import archive. Failed to save story."),
-                                             self);
-                              });
-                              
-                          }];
-                     };
-                     
-                     Story *duplicate = nil;
-                     for (Story *story_ in _stories) {
-                         if ([[story ifId] isEqualToString:[story_ ifId]]) {
-                             duplicate = story_;
-                             break;
-                         }
-                     }
-                     
-                     if (duplicate) {
-                         AlertQuestionWithCancelHandler(_LS(@"Duplicate Story"),
-                                                        _LS(@"A story with the same IFID exists? Do you want to overwrite the existing story?"),
-                                                        _LS(@"Cancel"),
-                                                        ^(UIAlertAction *action) {
-                                                            HIDE_WAIT();
-                                                            AlertInfo(_LS(@"Import"),
-                                                                      _LS(@"Import cancelled."),
-                                                                      _LS(@"Close"),
-                                                                      self);
-                                                            removeTempFiles();
-                                                        },
-                                                        _LS(@"Overwrite"),
-                                                        YES,
-                                                        ^(UIAlertAction *action) {
-                                                            writeToSaveDir(duplicate);
-                                                        },
-                                                        self);
-                     }
-                     else {
-                         writeToSaveDir(nil);
-                     }
-                 }
-                 error:^(NSError *error) {
-                     NSLog(@"%@", error);
-                     DispatchAsyncMain(^{
-                         HIDE_WAIT();
-                         AlertError(_LS(@"Unable to import archive."),
-                                    self);
-                     });
-                     removeTempFiles();
-                 }];
+                [self importHtml:url];
             }
         });
     }
     
     return YES;
+}
+
+- (void)importHtml:(NSURL *)url {
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    void (^removeUrl)() = ^{
+        NSError *error = nil;
+        [fileManager removeItemAtURL:url error:&error];
+        if (error) {
+            NSLog(@"%@", error);
+        }
+    };
+    
+    NSString *importPath = [[url path] stringByDeletingLastPathComponent];
+    NSString *filename = [[url path] lastPathComponent];
+    NSError *error = nil;
+    
+    if (![filename isEqualToString:@"story.html"]) {
+        [fileManager moveItemAtPath:[url path]
+                             toPath:[importPath stringByAppendingPathComponent:@"story.html"]
+                              error:&error];
+        if (error) {
+            
+        }
+    }
+        
+    Story* story = [Story new];
+    [story setPath:importPath];
+    [story
+     load:^(Story *story) {
+         void (^writeToSaveDir)(Story *_oldStory) = ^(Story *_oldStory){
+             NSString *savePath = [[self saveDir] stringByAppendingPathComponent:[story ifId]];
+             
+             NSError *error = nil;
+             if ([fileManager fileExistsAtPath:savePath]) {
+                 [fileManager removeItemAtPath:savePath error:&error];
+                 if (error) {
+                     NSLog(@"%@", error);
+                     removeUrl();
+                     DispatchAsyncMain(^{
+                         HIDE_WAIT();
+                         AlertError(_LS(@"Unable to import story. Failed to overwrite old save directory."),
+                                    self);
+                     });
+                     return;
+                 }
+             }
+             
+             [fileManager createDirectoryAtPath:savePath
+                    withIntermediateDirectories:NO
+                                     attributes:nil
+                                          error:&error];
+             if (error) {
+                 NSLog(@"%@", error);
+                 removeUrl();
+                 DispatchAsyncMain(^{
+                     HIDE_WAIT();
+                     if (_oldStory) {
+                         [_stories removeObject:_oldStory];
+                         [[self tableView] reloadData];
+                     }
+                     AlertError(_LS(@"Unable to import story. Failed to create save directory."),
+                                self);
+                 });
+                 return;
+             }
+             
+             [story setPath:savePath];
+             [story setLastUpdate:[NSDate date]];
+             [story
+              save:^(Story *story) {
+                  removeUrl();
+                  if (_oldStory) {
+                      [_stories removeObject:_oldStory];
+                  }
+                  [_stories addObject:story];
+                  [self sortObjects];
+                  DispatchAsyncMain(^{
+                      [[self tableView] reloadData];
+                      HIDE_WAIT();
+                      AlertInfo(_LS(@"Import"),
+                                _LS(@"Story successfully imported."),
+                                _LS(@"Close"),
+                                self);
+                  });
+              }
+              error:^(NSError *error) {
+                  NSLog(@"%@", error);
+                  removeUrl();
+                  DispatchAsyncMain(^{
+                      if (_oldStory) {
+                          [_stories removeObject:_oldStory];
+                          [[self tableView] reloadData];
+                      }
+                      HIDE_WAIT();
+                      AlertError(_LS(@"Failed to save story."),
+                                 self);
+                  });
+                  
+              }];
+         };
+         
+         if (![[story ifId] notEmpty]) {
+             [story setIfId:[[NSUUID new] UUIDString]];
+         }
+         
+         Story *duplicate = nil;
+         for (Story *story_ in _stories) {
+             if ([[story ifId] isEqualToString:[story_ ifId]]) {
+                 duplicate = story_;
+                 break;
+             }
+         }
+         
+         if (duplicate) {
+             AlertQuestionWithCancelHandler(_LS(@"Duplicate Story"),
+                                            _LS(@"A story with the same IFID exists? Do you want to overwrite the existing story?"),
+                                            _LS(@"Cancel"),
+                                            ^(UIAlertAction *action) {
+                                                HIDE_WAIT();
+                                                AlertInfo(_LS(@"Import"),
+                                                          _LS(@"Import cancelled."),
+                                                          _LS(@"Close"),
+                                                          self);
+                                                removeUrl();
+                                            },
+                                            _LS(@"Overwrite"),
+                                            YES,
+                                            ^(UIAlertAction *action) {
+                                                writeToSaveDir(duplicate);
+                                            },
+                                            self);
+         }
+         else {
+             writeToSaveDir(nil);
+         }
+     }
+     error:^(NSError *error) {
+         NSLog(@"%@", error);
+         DispatchAsyncMain(^{
+             HIDE_WAIT();
+             AlertError(_LS(@"Unable to import story."),
+                        self);
+         });
+         removeUrl();
+     }];
+}
+
+- (void)importZip:(NSURL *)url {
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    void (^removeUrl)() = ^{
+        NSError *error = nil;
+        [fileManager removeItemAtURL:url error:&error];
+        if (error) {
+            NSLog(@"%@", error);
+        }
+    };
+    
+    NSString *importPath = [AppDirectory() stringByAppendingPathComponent:@"Import"];
+    BOOL isDir, exists = [fileManager fileExistsAtPath:importPath isDirectory:&isDir];
+    NSError *error = nil;
+    if (exists) {
+        if (!isDir) {
+            [fileManager removeItemAtPath:importPath error:&error];
+            if (error) {
+                NSLog(@"%@", error);
+            }
+            exists = NO;
+        }
+    }
+    if (!exists) {
+        error = nil;
+        [fileManager createDirectoryAtPath:importPath
+               withIntermediateDirectories:NO
+                                attributes:nil
+                                     error:&error];
+        if (error) {
+            NSLog(@"%@", error);
+            removeUrl();
+            DispatchAsyncMain(^{
+                HIDE_WAIT();
+                AlertError(@"Unable to create temporary directory.",
+                           self);
+            });
+        }
+    }
+    NSString *tempPath = [importPath stringByAppendingPathComponent:[[NSUUID new] UUIDString]];
+    error = nil;
+    NSLog(@"Creating temporary directory %@", tempPath);
+    [fileManager createDirectoryAtPath:tempPath
+           withIntermediateDirectories:NO
+                            attributes:nil
+                                 error:&error];
+    if (error) {
+        NSLog(@"%@", error);
+        removeUrl();
+        DispatchAsyncMain(^{
+            HIDE_WAIT();
+            AlertError(@"Unable to create temporary directory.",
+                       self);
+        });
+    }
+    
+    void (^removeTempFiles)() = ^() {
+        NSError *error = nil;
+        removeUrl();
+        [fileManager removeItemAtPath:tempPath error:&error];
+        if (error) {
+            NSLog(@"%@", error);
+        }
+    };
+    
+    [SSZipArchive unzipFileAtPath:[url path]
+                    toDestination:tempPath
+                        overwrite:YES
+                         password:nil
+                            error:&error];
+    if (error) {
+        NSLog(@"%@", error);
+        removeTempFiles();
+        DispatchAsyncMain(^{
+            HIDE_WAIT();
+            AlertError(@"Unable to extract archive contents.",
+                       self);
+        });
+    }
+    else {
+        error = nil;
+        
+        NSString *htmlPath = [tempPath stringByAppendingPathComponent:@"story.html"];
+        if (![fileManager fileExistsAtPath:htmlPath]) {
+            htmlPath = [tempPath stringByAppendingPathComponent:@"game.html"];
+            if (![fileManager fileExistsAtPath:htmlPath]) {
+                htmlPath = [tempPath stringByAppendingPathComponent:@"proof.html"];
+                if (![fileManager fileExistsAtPath:htmlPath]) {
+                    // Nada!
+                    removeTempFiles();
+                    DispatchAsyncMain(^{
+                        HIDE_WAIT();
+                        AlertError(@"Missing story.html file.",
+                                   self);
+                    });
+                    return;
+                }
+            }
+            [fileManager moveItemAtPath:htmlPath
+                                 toPath:[tempPath stringByAppendingPathComponent:@"story.html"]
+                                  error:&error];
+            if (error) {
+                NSLog(@"%@", error);
+                removeTempFiles();
+                DispatchAsyncMain(^{
+                    HIDE_WAIT();
+                    AlertError(@"Missing or corrupt story.html file.",
+                               self);
+                });
+                return;
+            }
+        }
+        
+        Story* story = [Story new];
+        [story setPath:tempPath];
+        [story
+         load:^(Story *story) {
+             void (^writeToSaveDir)(Story *_oldStory) = ^(Story *_oldStory){
+                 NSString *savePath = [[self saveDir] stringByAppendingPathComponent:[story ifId]];
+                 NSString *imagesPath = [savePath stringByAppendingPathComponent:@"images"];
+                 
+                 NSError *error = nil;
+                 if ([fileManager fileExistsAtPath:savePath]) {
+                     [fileManager removeItemAtPath:savePath error:&error];
+                     if (error) {
+                         NSLog(@"%@", error);
+                         removeTempFiles();
+                         DispatchAsyncMain(^{
+                             HIDE_WAIT();
+                             AlertError(_LS(@"Unable to import archive. Failed to overwrite old save directory."),
+                                        self);
+                         });
+                         return;
+                     }
+                 }
+                 
+                 [fileManager createDirectoryAtPath:imagesPath
+                        withIntermediateDirectories:YES
+                                         attributes:nil
+                                              error:&error];
+                 if (error) {
+                     NSLog(@"%@", error);
+                     removeTempFiles();
+                     DispatchAsyncMain(^{
+                         HIDE_WAIT();
+                         if (_oldStory) {
+                             [_stories removeObject:_oldStory];
+                             [[self tableView] reloadData];
+                         }
+                         AlertError(_LS(@"Unable to import archive. Failed to create save directory."),
+                                    self);
+                     });
+                     return;
+                 }
+                 
+                 NSString *tempImagesPath = [tempPath stringByAppendingPathComponent:@"images"];
+                 NSArray *images = [fileManager contentsOfDirectoryAtPath:tempImagesPath error:&error];
+                 int failedTransfers = 0;
+                 if (error) {
+                     NSLog(@"%@", error);
+                 }
+                 else {
+                     for (NSString *filename in images) {
+                         error = nil;
+                         [fileManager moveItemAtPath:[tempImagesPath stringByAppendingPathComponent:filename]
+                                              toPath:[imagesPath stringByAppendingPathComponent:filename]
+                                               error:&error];
+                         if (error) {
+                             NSLog(@"%@", error);
+                             failedTransfers++;
+                         }
+                     }
+                 }
+                 
+                 [story setPath:savePath];
+                 [story setLastUpdate:[NSDate date]];
+                 [story
+                  save:^(Story *story) {
+                      removeTempFiles();
+                      if (_oldStory) {
+                          [_stories removeObject:_oldStory];
+                      }
+                      [_stories addObject:story];
+                      [self sortObjects];
+                      DispatchAsyncMain(^{
+                          [[self tableView] reloadData];
+                          HIDE_WAIT();
+                          NSString *msg = failedTransfers ?
+                          [NSString stringWithFormat:_LS(@"Story successfully imported, but failed to transfer %d image files."), failedTransfers]:
+                          _LS(@"Story successfully imported.");
+                          AlertInfo(_LS(@"Import"),
+                                    msg,
+                                    _LS(@"Close"),
+                                    self);
+                      });
+                  }
+                  error:^(NSError *error) {
+                      NSLog(@"%@", error);
+                      removeTempFiles();
+                      DispatchAsyncMain(^{
+                          if (_oldStory) {
+                              [_stories removeObject:_oldStory];
+                              [[self tableView] reloadData];
+                          }
+                          HIDE_WAIT();
+                          AlertError(_LS(@"Unable to import archive. Failed to save story."),
+                                     self);
+                      });
+                      
+                  }];
+             };
+             
+             if (![[story ifId] notEmpty]) {
+                 [story setIfId:[[NSUUID new] UUIDString]];
+             }
+             
+             Story *duplicate = nil;
+             for (Story *story_ in _stories) {
+                 if ([[story ifId] isEqualToString:[story_ ifId]]) {
+                     duplicate = story_;
+                     break;
+                 }
+             }
+             
+             if (duplicate) {
+                 AlertQuestionWithCancelHandler(_LS(@"Duplicate Story"),
+                                                _LS(@"A story with the same IFID exists? Do you want to overwrite the existing story?"),
+                                                _LS(@"Cancel"),
+                                                ^(UIAlertAction *action) {
+                                                    HIDE_WAIT();
+                                                    AlertInfo(_LS(@"Import"),
+                                                              _LS(@"Import cancelled."),
+                                                              _LS(@"Close"),
+                                                              self);
+                                                    removeTempFiles();
+                                                },
+                                                _LS(@"Overwrite"),
+                                                YES,
+                                                ^(UIAlertAction *action) {
+                                                    writeToSaveDir(duplicate);
+                                                },
+                                                self);
+             }
+             else {
+                 writeToSaveDir(nil);
+             }
+         }
+         error:^(NSError *error) {
+             NSLog(@"%@", error);
+             DispatchAsyncMain(^{
+                 HIDE_WAIT();
+                 AlertError(_LS(@"Unable to import archive."),
+                            self);
+             });
+             removeTempFiles();
+         }];
+    }
 }
 
 - (void)saveData {
