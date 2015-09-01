@@ -79,6 +79,36 @@ UIAlertController *AlertQuestion(NSString *title,
     return alertController;
 }
 
+UIAlertController *AlertQuestionWithCancelHandler(NSString *title,
+                                                  NSString *message,
+                                                  NSString *cancelTitle,
+                                                  void (^cancelHandler)(UIAlertAction *action),
+                                                  NSString *actionTitle,
+                                                  BOOL destructive,
+                                                  void (^handler)(UIAlertAction *action),
+                                                  UIViewController *presenter) {
+    UIAlertController *alertController =
+    [UIAlertController alertControllerWithTitle:title
+                                        message:message
+                                 preferredStyle:UIAlertControllerStyleAlert];
+    [alertController addAction:
+     [UIAlertAction actionWithTitle:cancelTitle
+                              style:UIAlertActionStyleCancel
+                            handler:cancelHandler]];
+    [alertController addAction:
+     [UIAlertAction actionWithTitle:actionTitle
+                              style:(destructive ?
+                                     UIAlertActionStyleDestructive:
+                                     UIAlertActionStyleDefault)
+                            handler:handler]];
+    if (presenter) {
+        [presenter presentViewController:alertController
+                                animated:YES
+                              completion:nil];
+    }
+    return alertController;
+}
+
 void CreateBackButtonOn(UINavigationItem* navigationItem, id target, SEL action) {
     UIButton* button = CreateBackButton();
     UIBarButtonItem* bbi = [[UIBarButtonItem alloc] initWithCustomView:button];

@@ -167,7 +167,7 @@ static NSString *_template = @"<tw-storydata name=\"%@\" startnode=\"%@\" creato
 }
 
 - (void)load:(void (^)(Story *story))completionHandler error:(void (^)(NSError *error))errorHandler {
-    DISPATCH_ASYNC(^{
+    DispatchAsync(^{
         NSError *error = nil;
         if (!_path) {
             error = [NSError errorWithDomain:@"Story" code:kNoPath userInfo:@{NSLocalizedDescriptionKey:_LS(@"No path to load from")}];
@@ -178,6 +178,7 @@ static NSString *_template = @"<tw-storydata name=\"%@\" startnode=\"%@\" creato
         }
         
         NSString *path = [_path stringByAppendingPathComponent:@"story.html"];
+        NSLog(@"Reading %@", path);
         NSString* contents = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:&error];
         if (error) {
             if (errorHandler) {
@@ -523,6 +524,9 @@ static NSString *_template = @"<tw-storydata name=\"%@\" startnode=\"%@\" creato
         _storyFormat = [attributeDict valueForKey:@"format"];
         NSLog(@"Creator: %@", [attributeDict valueForKey:@"creator"]);
         NSLog(@"Version: %@", [attributeDict valueForKey:@"creator-version"]);
+        if ([[attributeDict valueForKey:@"ifid"] notEmpty]) {
+            _ifId = [attributeDict valueForKey:@"ifid"];
+        }
         NSLog(@"IFId: %@", [attributeDict valueForKey:@"ifid"]);
         NSLog(@"Options: %@", [attributeDict valueForKey:@"options"]);
         NSString *startNode = [attributeDict valueForKey:@"startnode"];

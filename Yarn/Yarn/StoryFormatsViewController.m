@@ -6,6 +6,7 @@
 //  Copyright (c) 2015 Mark Jundo Documento. All rights reserved.
 //
 
+#import "Constants.h"
 #import "InputAccessoryView.h"
 #import "StoryFormat.h"
 #import "StoryFormatViewController.h"
@@ -251,7 +252,7 @@
     static NSString *saveDir;
     if (!saveDir) {
         saveDir = [AppDirectory() stringByAppendingPathComponent:
-                   @"proofing-formats"];
+                   (NSString *)kYarnStoryFormatSaveDir];
     }
     return saveDir;
 }
@@ -260,7 +261,7 @@
     static NSString *saveDir;
     if (!saveDir) {
         saveDir = [AppDirectory() stringByAppendingPathComponent:
-                   @"formats"];
+                   (NSString *)kYarnStoryFormatSaveDir];
     }
     return saveDir;
 }

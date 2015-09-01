@@ -6,8 +6,9 @@
 //  Copyright (c) 2015 Mark Jundo Documento. All rights reserved.
 //
 
+#import "AppDelegate.h"
 #import "HomeViewController.h"
 
-@interface StoriesViewController : UITableViewController <EntityList>
+@interface StoriesViewController : UITableViewController <AppDataDelegate, EntityList>
 
 @end
