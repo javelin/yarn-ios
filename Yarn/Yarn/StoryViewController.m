@@ -233,15 +233,16 @@ static CGFloat GridSpacing = 140.0;
 }
 
 #pragma mark Handlers
-- (void)handleArchiveProofingCopy {
-    [self publish:YES createArchive:YES];
+- (void)handleExportProofingCopy:(BOOL)createArchive {
+    [self publishProofing:YES export:YES createArchive:createArchive];
 }
 
-- (void)handleArchiveStory {
+- (void)handleExportStory:(BOOL)createArchive {
     [_story
-     saveAndCreateZip:YES
+     saveAndCreateZip:createArchive
      completion:^(Story *story, NSString *zipPath) {
-         NSURL *url = [NSURL fileURLWithPath:zipPath];
+         NSString *path = createArchive ? zipPath:[self createHtmlLinkForExport:story filename:@"story.html"];
+         NSURL *url = [NSURL fileURLWithPath:path];
          NSLog(@"Exporting %@", url);
          _exportInteractionController =
          [UIDocumentInteractionController interactionControllerWithURL:url];
@@ -390,10 +391,17 @@ static CGFloat GridSpacing = 140.0;
                                 }]];
         
         [_menuController addAction:
-         [UIAlertAction actionWithTitle:_LS(@"Archive Proofing Copy")
+         [UIAlertAction actionWithTitle:_LS(@"Export Proofing Copy")
                                   style:UIAlertActionStyleDefault
                                 handler:^(UIAlertAction *action) {
-                                    [self handleArchiveProofingCopy];
+                                    [self handleExportProofingCopy:YES];
+                                }]];
+        
+        [_menuController addAction:
+         [UIAlertAction actionWithTitle:_LS(@"Export Proofing Copy (HTML)")
+                                  style:UIAlertActionStyleDefault
+                                handler:^(UIAlertAction *action) {
+                                    [self handleExportProofingCopy:NO];
                                 }]];
         
         [_menuController addAction:
@@ -404,17 +412,30 @@ static CGFloat GridSpacing = 140.0;
                                 }]];
         
         [_menuController addAction:
-         [UIAlertAction actionWithTitle:_LS(@"Publish Story")
+         [UIAlertAction actionWithTitle:_LS(@"Publish & Export Story")
                                   style:UIAlertActionStyleDefault
                                 handler:^(UIAlertAction *action) {
-                                    [self handlePublish];
+                                    [self handlePublish:YES];
                                 }]];
         
         [_menuController addAction:
-         [UIAlertAction actionWithTitle:_LS(@"Archive Story")
+         [UIAlertAction actionWithTitle:_LS(@"Publish & Export Story (HTML)")
                                   style:UIAlertActionStyleDefault
                                 handler:^(UIAlertAction *action) {
-                                    [self handleArchiveStory];
+                                    [self handlePublish:NO];
+                                }]];
+        
+        [_menuController addAction:
+         [UIAlertAction actionWithTitle:_LS(@"Export Story")
+                                  style:UIAlertActionStyleDefault
+                                handler:^(UIAlertAction *action) {
+                                    [self handleExportStory:YES];
+                                }]];
+        [_menuController addAction:
+         [UIAlertAction actionWithTitle:_LS(@"Export Story (HTML)")
+                                  style:UIAlertActionStyleDefault
+                                handler:^(UIAlertAction *action) {
+                                    [self handleExportStory:NO];
                                 }]];
         
         [_menuController addAction:
@@ -437,8 +458,8 @@ static CGFloat GridSpacing = 140.0;
     [self testPlayFrom:[[passageView passage] Id]];
 }
 
-- (void)handlePublish {
-    [self publish:NO createArchive:YES];
+- (void)handlePublish:(BOOL)createArchive {
+    [self publishProofing:NO export:YES createArchive:createArchive];
 }
 
 - (void)handleSetStartPassageIn:(PassageView *)passageView {
@@ -470,7 +491,7 @@ static CGFloat GridSpacing = 140.0;
 }
 
 - (void)handleViewProofingCopy {
-    [self publish:YES createArchive:NO];
+    [self publishProofing:YES export:NO createArchive:NO];
 }
 
 - (void)editStorySettings:(BOOL)newStory {
@@ -480,7 +501,9 @@ static CGFloat GridSpacing = 140.0;
                                            animated:YES];
 }
 
-- (void)publish:(BOOL)proofing createArchive:(BOOL)createArchive {
+- (void)publishProofing:(BOOL)proofing
+                 export:(BOOL)export
+          createArchive:(BOOL)createArchive {
     if (proofing) {
         NSAssert(_proofingFormat != nil, @"Proofing format must have been set already.");
     }
@@ -510,11 +533,12 @@ static CGFloat GridSpacing = 140.0;
              publishStory:_story
              startId:-1
              options:@[]
-             createZip:createArchive
+             createZip:export && createArchive
              completion:^(Story *story, NSString *path) {
                  HIDE_WAIT();
-                 if ([[path pathExtension] isEqualToString:@"zip"]) {
-                     NSURL *url = [NSURL fileURLWithPath:path];
+                 if (export) {
+                     NSURL *url = [NSURL fileURLWithPath:createArchive ? path:
+                                   [self createHtmlLinkForExport:story filename:[path lastPathComponent]]];
                      NSLog(@"Exporting %@", url);
                      _exportInteractionController =
                      [UIDocumentInteractionController interactionControllerWithURL:url];
@@ -543,6 +567,34 @@ static CGFloat GridSpacing = 140.0;
                        self);
         }
     }
+}
+
+- (NSString *)createHtmlLinkForExport:(Story *)story filename:(NSString *)filename {
+    NSString *path = [[story name] stringByReplacingOccurrencesOfString:@" " withString:@"-"];
+    path = [path stringByAppendingString:@"-"];
+    path = [path stringByAppendingString:[story ifId]];
+    path = [path stringByAppendingPathExtension:@"export"];
+    path = [path stringByAppendingFormat:@".%@", filename];
+    path = [[story path] stringByAppendingPathComponent:path];
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSError *error = nil;
+    if ([filename isEqualToString:@"story.html"]) {
+        [fileManager linkItemAtPath:[[story path] stringByAppendingPathComponent:filename]
+                             toPath:path
+                              error:&error];
+    }
+    else {
+        [fileManager linkItemAtPath:[[[story path] stringByAppendingPathComponent:@"build"]
+                                     stringByAppendingPathComponent:filename]
+                             toPath:path
+                              error:&error];
+    }
+    if (error) {
+        NSLog(@"%@", error);
+        path = [[story path] stringByAppendingPathComponent:filename];
+    }
+    
+    return path;
 }
 
 #pragma mark Passages

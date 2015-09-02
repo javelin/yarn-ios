@@ -148,17 +148,15 @@ typedef enum StorySortMethod {
         }
     };
     
-    NSString *importPath = [[url path] stringByDeletingLastPathComponent];
+    NSString *importPath = [AppDirectory() stringByAppendingPathComponent:@"import"];
     NSString *filename = [[url path] lastPathComponent];
     NSError *error = nil;
     
-    if (![filename isEqualToString:@"story.html"]) {
-        [fileManager moveItemAtPath:[url path]
-                             toPath:[importPath stringByAppendingPathComponent:@"story.html"]
-                              error:&error];
-        if (error) {
-            
-        }
+    [fileManager linkItemAtPath:[url path]
+                         toPath:[importPath stringByAppendingPathComponent:@"story.html"]
+                          error:&error];
+    if (error) {
+        NSLog(@"%@", error);
     }
         
     Story* story = [Story new];
@@ -293,7 +291,7 @@ typedef enum StorySortMethod {
         }
     };
     
-    NSString *importPath = [AppDirectory() stringByAppendingPathComponent:@"Import"];
+    NSString *importPath = [AppDirectory() stringByAppendingPathComponent:@"import"];
     BOOL isDir, exists = [fileManager fileExistsAtPath:importPath isDirectory:&isDir];
     NSError *error = nil;
     if (exists) {
