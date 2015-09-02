@@ -17,6 +17,8 @@ const NSString *kYarnDefaultStoryFormat = @"Paperthin";
 
 const CGFloat kYarnFontSizeAutosave = 10.0;
 const CGFloat kYarnFontSizeAutosaveIpad = 12.0;
+const CGFloat kYarnFontSizeSnapToGrid = 10.0;
+const CGFloat kYarnFontSizeSnapToGridIpad = 12.0;
 
 const NSString *kYarnKeyDefaultStoryFormat = @"com.mjdocumento.default.story.format";
 const NSString *kYarnKeyProofingFormat = @"com.mjdocumento.proofing.format";

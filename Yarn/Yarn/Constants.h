@@ -17,6 +17,8 @@ extern const NSString *kYarnDefaultStoryFormat;
 
 extern const CGFloat kYarnFontSizeAutosave;
 extern const CGFloat kYarnFontSizeAutosaveIpad;
+extern const CGFloat kYarnFontSizeSnapToGrid;
+extern const CGFloat kYarnFontSizeSnapToGridIpad;
 
 extern const NSString *kYarnKeyDefaultStoryFormat;
 extern const NSString *kYarnKeyProofingFormat;

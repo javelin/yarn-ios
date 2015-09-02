@@ -22,6 +22,7 @@
 }
 
 @property (nonatomic, strong) StoryView *storyView;
+@property (nonatomic, strong) UILabel *snapToGridLabel;
 
 @property (nonatomic, strong) MediaPickerViewController *mediaPickerViewController;
 @property (nonatomic, strong) PassageEditorViewController *passageEditorViewController;
@@ -122,9 +123,10 @@ static CGFloat GridSpacing = 140.0;
 }
 
 - (void)createViews {
+    [[self view] setBackgroundColor:[UIColor lightGrayColor]];
     _storyView = [[StoryView alloc] initWithController:self];
     _scrollView = [[UIScrollView alloc] init];
-    [_scrollView setBackgroundColor:[UIColor lightGrayColor]];
+    [_scrollView setBackgroundColor:[UIColor clearColor]];
     [_scrollView setMaximumZoomScale:2.0];
     [_scrollView setMinimumZoomScale:0.25];
     [_scrollView setClipsToBounds:YES];
@@ -139,6 +141,17 @@ static CGFloat GridSpacing = 140.0;
         }
     }
     ADD_SUBVIEW_FILL([self view], _scrollView);
+    
+    INIT_VIEW(UILabel, _snapToGridLabel, [self view]);
+    [_snapToGridLabel setBackgroundColor:[UIColor clearColor]];
+    [_snapToGridLabel setFont:[UIFont boldSystemFontOfSize:
+                               IS_IPAD() ? kYarnFontSizeSnapToGridIpad:kYarnFontSizeSnapToGrid]];
+    [_snapToGridLabel setTextAlignment:NSTextAlignmentRight];
+    [_snapToGridLabel setTextColor:[UIColor whiteColor]];
+    [_snapToGridLabel setText:[@"Snap To Grid: " stringByAppendingString:_snapsToGrid ? @"On":@"Off"]];
+    CONSTRAINT_EQ([self view], _snapToGridLabel, Left, [self view], Left, 1.0, 10.0);
+    CONSTRAINT_EQ([self view], _snapToGridLabel, Right, [self view], Right, 1.0, -10.0);
+    CONSTRAINT_EQ([self view], _snapToGridLabel, Bottom, [self view], Bottom, 1.0, -10.0);
     
     CGFloat largestX = 0, largestY = 0;
     for (NSString *key in [[_story passages] allKeys]) {
@@ -448,8 +461,9 @@ static CGFloat GridSpacing = 140.0;
 
 - (void)handleToggleSnapToGrid {
     [self setSnapsToGrid:!_snapsToGrid];
-    AlertAndDismissInfo(_snapsToGrid ? _LS(@"Snap to Grid: Yes"):
-                        _LS(@"Snap to Grid: No"),
+    [_snapToGridLabel setText:[@"Snap To Grid: " stringByAppendingString:_snapsToGrid ? @"On":@"Off"]];
+    AlertAndDismissInfo(_snapsToGrid ? _LS(@"Snap to Grid: On"):
+                        _LS(@"Snap to Grid: Off"),
                         nil,
                         1.5,
                         self);
