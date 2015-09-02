@@ -6,6 +6,7 @@
 //  Copyright © 2015 Mark Jundo Documento. All rights reserved.
 //
 
+#import "Constants.h"
 #import "AutosavingViewController.h"
 #import "ViewUtils.h"
 
@@ -24,7 +25,7 @@
         [self setView:[UIView new]];
         INIT_VIEW(UILabel, _autosaveLabel, [self view]);
         [_autosaveLabel setBackgroundColor:[[UIColor blackColor] colorWithAlphaComponent:0.7]];
-        [_autosaveLabel setFont:[UIFont systemFontOfSize:10.0]];
+        [_autosaveLabel setFont:[UIFont systemFontOfSize:IS_IPAD() ? kYarnFontSizeAutosaveIpad:kYarnFontSizeAutosave]];
         [_autosaveLabel setHidden:YES];
         [_autosaveLabel setText:_LS(@"Autosaving...")];
         [_autosaveLabel setTextAlignment:NSTextAlignmentCenter];

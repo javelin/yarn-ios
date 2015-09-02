@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 Mark Documento. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 extern const NSString *kBundleTwineVersionKey;
 extern const NSString *kBundleYarnSourceURL;
@@ -14,6 +14,10 @@ extern const NSString *kBundleMyEmail;
 extern const NSTimeInterval kYarnDefaultAutosaveInterval;
 extern const NSString *kYarnDefaultProofingFormat;
 extern const NSString *kYarnDefaultStoryFormat;
+
+extern const CGFloat kYarnFontSizeAutosave;
+extern const CGFloat kYarnFontSizeAutosaveIpad;
+
 extern const NSString *kYarnKeyDefaultStoryFormat;
 extern const NSString *kYarnKeyProofingFormat;
 extern const NSString *kYarnKeySnapToGrid;

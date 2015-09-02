@@ -14,6 +14,10 @@ const NSString *kBundleMyEmail = @"com.mjdocumento.my.email";
 const NSTimeInterval kYarnDefaultAutosaveInterval = 300.0; // five minutes
 const NSString *kYarnDefaultProofingFormat = @"Harlowe";
 const NSString *kYarnDefaultStoryFormat = @"Paperthin";
+
+const CGFloat kYarnFontSizeAutosave = 10.0;
+const CGFloat kYarnFontSizeAutosaveIpad = 12.0;
+
 const NSString *kYarnKeyDefaultStoryFormat = @"com.mjdocumento.default.story.format";
 const NSString *kYarnKeyProofingFormat = @"com.mjdocumento.proofing.format";
 const NSString *kYarnKeySnapToGrid = @"com.mjdocumento.snap.to.grid";
