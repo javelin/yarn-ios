@@ -145,6 +145,9 @@ static CGFloat GridSpacing = 140.0;
         }
     }
     ADD_SUBVIEW_FILL([self view], _scrollView);
+    if (!IS_IPAD()) {
+        [_scrollView setZoomScale:0.75];
+    }
     
     INIT_VIEW(UILabel, _snapToGridLabel, [self view]);
     [_snapToGridLabel setBackgroundColor:[UIColor clearColor]];
