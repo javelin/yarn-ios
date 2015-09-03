@@ -257,6 +257,7 @@ typedef void (^StoryFormatCompletionBlock)(StoryFormat *storyFormat);
                                              withString:@""
                                                 options:NSRegularExpressionSearch
                                                   range:NSMakeRange(0, [[story name] length])];
+            fname = [fname stringByReplacingOccurrencesOfString:@" " withString:@"-"];
             fname = [fname stringByAppendingFormat:@"-%@", [story ifId]];
             fname = [fname stringByAppendingPathExtension:@"export"];
             fname = [fname stringByAppendingPathExtension:[self isProofing] ? @"proof":@"game"];

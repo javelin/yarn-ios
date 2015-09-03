@@ -434,6 +434,7 @@ static NSString *_template = @"<tw-storydata name=\"%@\" startnode=\"%@\" creato
                                              withString:@""
                                                 options:NSRegularExpressionSearch
                                                   range:NSMakeRange(0, [_name length])];
+            fname = [fname stringByReplacingOccurrencesOfString:@" " withString:@"-"];
             fname = [fname stringByAppendingFormat:@"-%@", _ifId];
             fname = [fname stringByAppendingPathExtension:@"export"];
             fname = [fname stringByAppendingPathExtension:@"story"];
