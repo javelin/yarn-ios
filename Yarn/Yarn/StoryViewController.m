@@ -29,6 +29,8 @@
 
 @property (nonatomic, strong) UIAlertController *createPassageController;
 @property (nonatomic, strong) UIAlertController *menuController;
+@property (nonatomic, strong) UIAlertController *exportArchiveMenuController;
+@property (nonatomic, strong) UIAlertController *exportHtmlMenuController;
 
 @property (nonatomic, strong) UIDocumentInteractionController *exportInteractionController;
 @property (nonatomic, strong) UIScrollView *scrollView;
@@ -54,6 +56,8 @@ static CGFloat GridSpacing = 140.0;
         _proofingFormats = proofingFormats;
         
         _createPassageController = nil;
+        _exportArchiveMenuController = nil;
+        _exportHtmlMenuController = nil;
         _menuController = nil;
         
         _isClosing = NO;
@@ -356,6 +360,94 @@ static CGFloat GridSpacing = 140.0;
                                            animated:YES];
 }
 
+- (void)handleExportArchive {
+    if (!_exportArchiveMenuController) {
+        _exportArchiveMenuController =
+        [UIAlertController alertControllerWithTitle:_LS(@"Export Archive")
+                                            message:nil
+                                     preferredStyle:UIAlertControllerStyleActionSheet];
+        [_exportArchiveMenuController addAction:
+         [UIAlertAction actionWithTitle:_LS(@"Proofing Copy")
+                                  style:UIAlertActionStyleDefault
+                                handler:^(UIAlertAction *action) {
+                                    [self handleExportProofingCopy:YES];
+                                }]];
+        
+        [_exportArchiveMenuController addAction:
+         [UIAlertAction actionWithTitle:_LS(@"Published Story")
+                                  style:UIAlertActionStyleDefault
+                                handler:^(UIAlertAction *action) {
+                                    [self handlePublish:YES];
+                                }]];
+        
+        [_exportArchiveMenuController addAction:
+         [UIAlertAction actionWithTitle:_LS(@"Story")
+                                  style:UIAlertActionStyleDefault
+                                handler:^(UIAlertAction *action) {
+                                    [self handleExportStory:YES];
+                                }]];
+        
+        [_exportArchiveMenuController addAction:
+         [UIAlertAction actionWithTitle:_LS(@"Cancel")
+                                  style:UIAlertActionStyleCancel
+                                handler:nil]];
+    }
+    
+    //iPad
+    UIPopoverPresentationController *presentationController =
+    [_exportArchiveMenuController popoverPresentationController];
+    [presentationController setBarButtonItem:[[self navigationItem] leftBarButtonItem]];
+    [presentationController setPermittedArrowDirections:UIPopoverArrowDirectionAny];
+    
+    [self presentViewController:_exportArchiveMenuController
+                       animated:YES
+                     completion:nil];
+}
+
+- (void)handleExportHtml {
+    if (!_exportHtmlMenuController) {
+        _exportHtmlMenuController =
+        [UIAlertController alertControllerWithTitle:_LS(@"Export HTML")
+                                            message:nil
+                                     preferredStyle:UIAlertControllerStyleActionSheet];
+        [_exportHtmlMenuController addAction:
+         [UIAlertAction actionWithTitle:_LS(@"Proofing Copy")
+                                  style:UIAlertActionStyleDefault
+                                handler:^(UIAlertAction *action) {
+                                    [self handleExportProofingCopy:NO];
+                                }]];
+        
+        [_exportHtmlMenuController addAction:
+         [UIAlertAction actionWithTitle:_LS(@"Published Story")
+                                  style:UIAlertActionStyleDefault
+                                handler:^(UIAlertAction *action) {
+                                    [self handlePublish:NO];
+                                }]];
+        
+        [_exportHtmlMenuController addAction:
+         [UIAlertAction actionWithTitle:_LS(@"Story")
+                                  style:UIAlertActionStyleDefault
+                                handler:^(UIAlertAction *action) {
+                                    [self handleExportStory:NO];
+                                }]];
+        
+        [_exportHtmlMenuController addAction:
+         [UIAlertAction actionWithTitle:_LS(@"Cancel")
+                                  style:UIAlertActionStyleCancel
+                                handler:nil]];
+    }
+    
+    //iPad
+    UIPopoverPresentationController *presentationController =
+    [_exportHtmlMenuController popoverPresentationController];
+    [presentationController setBarButtonItem:[[self navigationItem] leftBarButtonItem]];
+    [presentationController setPermittedArrowDirections:UIPopoverArrowDirectionAny];
+    
+    [self presentViewController:_exportHtmlMenuController
+                       animated:YES
+                     completion:nil];
+}
+
 - (void)handleMenu {
     if (!_menuController) {
         _menuController =
@@ -391,20 +483,6 @@ static CGFloat GridSpacing = 140.0;
                                 }]];
         
         [_menuController addAction:
-         [UIAlertAction actionWithTitle:_LS(@"Export Proofing Copy")
-                                  style:UIAlertActionStyleDefault
-                                handler:^(UIAlertAction *action) {
-                                    [self handleExportProofingCopy:YES];
-                                }]];
-        
-        [_menuController addAction:
-         [UIAlertAction actionWithTitle:_LS(@"Export Proofing Copy (HTML)")
-                                  style:UIAlertActionStyleDefault
-                                handler:^(UIAlertAction *action) {
-                                    [self handleExportProofingCopy:NO];
-                                }]];
-        
-        [_menuController addAction:
          [UIAlertAction actionWithTitle:_LS(@"Play")
                                   style:UIAlertActionStyleDefault
                                 handler:^(UIAlertAction *action) {
@@ -412,30 +490,17 @@ static CGFloat GridSpacing = 140.0;
                                 }]];
         
         [_menuController addAction:
-         [UIAlertAction actionWithTitle:_LS(@"Publish & Export Story")
+         [UIAlertAction actionWithTitle:_LS(@"Export Archive")
                                   style:UIAlertActionStyleDefault
                                 handler:^(UIAlertAction *action) {
-                                    [self handlePublish:YES];
+                                    [self handleExportArchive];
                                 }]];
         
         [_menuController addAction:
-         [UIAlertAction actionWithTitle:_LS(@"Publish & Export Story (HTML)")
+         [UIAlertAction actionWithTitle:_LS(@"Export HTML")
                                   style:UIAlertActionStyleDefault
                                 handler:^(UIAlertAction *action) {
-                                    [self handlePublish:NO];
-                                }]];
-        
-        [_menuController addAction:
-         [UIAlertAction actionWithTitle:_LS(@"Export Story")
-                                  style:UIAlertActionStyleDefault
-                                handler:^(UIAlertAction *action) {
-                                    [self handleExportStory:YES];
-                                }]];
-        [_menuController addAction:
-         [UIAlertAction actionWithTitle:_LS(@"Export Story (HTML)")
-                                  style:UIAlertActionStyleDefault
-                                handler:^(UIAlertAction *action) {
-                                    [self handleExportStory:NO];
+                                    [self handleExportHtml];
                                 }]];
         
         [_menuController addAction:
@@ -449,6 +514,7 @@ static CGFloat GridSpacing = 140.0;
     [_menuController popoverPresentationController];
     [presentationController setBarButtonItem:[[self navigationItem] leftBarButtonItem]];
     [presentationController setPermittedArrowDirections:UIPopoverArrowDirectionAny];
+    
     [self presentViewController:_menuController
                        animated:YES
                      completion:nil];
