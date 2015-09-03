@@ -132,21 +132,7 @@ void SetBorderColor(UIView *view, UIColor *color) {
 
 void SetRoundedCorners(UIView *view, CGFloat radius) {
     view.layer.cornerRadius = radius;
-}
-
-/*
-void SetBarButtonItemImageName(UIBarButtonItem *bbi, NSString *name) {
-    [bbi associate:@"image-name" with:name];
-}
-
-void EnableBarButtonItem(UIBarButtonItem *bbi, BOOL set) {
-    NSString *imageName = [bbi associated:@"image-name"];
-    if (imageName) {
-        UIImage *img = [UIImage imageNamed:set ? imageName:[imageName stringByAppendingString:@"-greyed"]];
-        if (img) {
-            bbi.image = [img imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
-        }
+    if ([view isKindOfClass:[UIImageView class]]) {
+        view.layer.masksToBounds = YES;
     }
-    bbi.enabled = set;
 }
-*/

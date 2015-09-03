@@ -92,31 +92,32 @@ static CGFloat GridSpacing = 140.0;
         _tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTitleTapped)];
         
         [[self navigationItem] setLeftBarButtonItem:
-         [[UIBarButtonItem alloc] initWithTitle:@"Menu"
+         [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"close"]
                                           style:UIBarButtonItemStylePlain
                                          target:self
-                                         action:@selector(handleMenu)]];
-        
-        UIBarButtonItem* play =
-        [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPlay
-                                                      target:self
-                                                      action:@selector(handleTestPlay)];
+                                         action:@selector(handleCloseStory)]];
         
         UIBarButtonItem* add =
         [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
                                                       target:self
                                                       action:@selector(handleCreateNewPassage)];
         
+        UIBarButtonItem* menu =
+        [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"more"]
+                                         style:UIBarButtonItemStylePlain
+                                        target:self
+                                        action:@selector(handleMenu)];
+        
         if (IS_IPAD()) {
-            UIBarButtonItem* close =
-            [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"close"]
-                                             style:UIBarButtonItemStylePlain
-                                            target:self
-                                            action:@selector(handleCloseStory)];
-            [[self navigationItem] setRightBarButtonItems:@[close, play, add]];
+            UIBarButtonItem* play =
+            [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPlay
+                                                          target:self
+                                                          action:@selector(handleTestPlay)];
+            [[self navigationItem] setRightBarButtonItems:@[menu, play, add]];
+            
         }
         else {
-            [[self navigationItem] setRightBarButtonItems:@[play, add]];
+            [[self navigationItem] setRightBarButtonItems:@[menu, add]];
         }
         
         _mediaPickerViewController =
@@ -202,7 +203,7 @@ static CGFloat GridSpacing = 140.0;
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [[self navigationController] setNavigationBarHidden:NO animated:YES];
-    [[[self navigationController] navigationBar] addGestureRecognizer:_tapGestureRecognizer];
+    //[[[self navigationController] navigationBar] addGestureRecognizer:_tapGestureRecognizer];
     [self setTitle:[_story name]];
 }
 
@@ -210,6 +211,12 @@ static CGFloat GridSpacing = 140.0;
     [super viewWillDisappear:animated];
     [[[self navigationController] navigationBar] removeGestureRecognizer:_tapGestureRecognizer];
     [self setTitle:@""];
+}
+
+- (void)willMoveToParentViewController:(nullable UIViewController *)parent {
+    if (!parent) {
+        [self handleCloseStory];
+    }
 }
 
 #pragma mark Autosave
@@ -837,10 +844,10 @@ static CGFloat GridSpacing = 140.0;
     [_story
      saveToPath:nil
      completion:^(Story *story) {
-        
+         HIDE_WAIT();
     }
     error:^(NSError *error) {
-        
+        HIDE_WAIT();
     }];
     
     NSInteger brokenLinks = [self updatePassageLinks];

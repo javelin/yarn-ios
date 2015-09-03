@@ -128,7 +128,4 @@ void SetBorderWidth(UIView *view, CGFloat borderWidth);
 void SetBorderColor(UIView *view, UIColor *color);
 void SetRoundedCorners(UIView *view, CGFloat radius);
 
-void SetBarButtonItemImageName(UIBarButtonItem *bbi, NSString *name);
-void EnableBarButtonItem(UIBarButtonItem *bbi, BOOL set);
-
 #endif

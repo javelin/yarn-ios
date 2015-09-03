@@ -29,18 +29,22 @@
                                          initWithBuiltInFormats:@[@"Paperthin"]
                                          proofing:YES]]];
     if (self) {
-        UIBarButtonItem *barButtonItem =
-        [[UIBarButtonItem alloc] initWithTitle:_LS(@"Menu")
-                                         style:UIBarButtonItemStylePlain
-                                        target:self
-                                        action:@selector(handleMenu)];
-        [[self navigationItem] setLeftBarButtonItem:barButtonItem];
+        UIImageView *iconImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"yarn-icon"]];
+        SetRoundedCorners(iconImageView, 20.0);
+        UIBarButtonItem *leftBarButtonItem =
+        [[UIBarButtonItem alloc] initWithCustomView:iconImageView];
+        [[self navigationItem] setLeftBarButtonItem:leftBarButtonItem];
         
-        barButtonItem =
+        UIBarButtonItem *addBarButtonItem =
         [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
                                                       target:self
                                                       action:@selector(handleCreateNew)];
-        [[self navigationItem] setRightBarButtonItem:barButtonItem];
+        UIBarButtonItem *menuBarButtonItem =
+        [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"more"]
+                                         style:UIBarButtonItemStylePlain
+                                        target:self
+                                        action:@selector(handleMenu)];
+        [[self navigationItem] setRightBarButtonItems:@[menuBarButtonItem, addBarButtonItem]];
     }
     
     return self;
