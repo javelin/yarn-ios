@@ -27,8 +27,14 @@
                                                       action:@selector(handleCancelPick)];
         [[self navigationItem] setLeftBarButtonItem:leftBarButtonItem];
         
-        [[self navigationItem] setRightBarButtonItems:@[[self albumsBarButtonItem],
-                                                        [self cameraBarButtonItem]]];
+        NSMutableArray *array = [NSMutableArray array];
+        if ([self albumsBarButtonItem]) {
+            [array addObject:[self albumsBarButtonItem]];
+        }
+        if ([self cameraBarButtonItem]) {
+            [array addObject:[self cameraBarButtonItem]];
+        }
+        [[self navigationItem] setRightBarButtonItems:array];
     }
     
     return self;
