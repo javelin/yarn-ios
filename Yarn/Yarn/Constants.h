@@ -24,9 +24,10 @@ extern const NSString *kYarnKeyDefaultStoryFormat;
 extern const NSString *kYarnKeyProofingFormat;
 extern const NSString *kYarnKeySnapToGrid;
 
-extern const NSString *kYarnStorySaveDir;
+extern const NSString *kYarnStoryImportDir;
 extern const NSString *kYarnStoryFormatSaveDir;
 extern const NSString *kYarnStoryProofingFormatSaveDir;
+extern const NSString *kYarnStorySaveDir;
 
 extern const NSInteger kDuplicatePassageName;
 extern const NSInteger kNoPath;

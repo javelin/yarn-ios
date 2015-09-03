@@ -35,6 +35,7 @@ void DispatchMainAfter(NSTimeInterval interval, dispatch_block_t block);
 NSString *AppDirectory();
 NSString *AppName();
 NSString *AppVersion();
+BOOL CreateDir(NSString *path, BOOL overwrite, NSError **error);
 NSString *SanitizeString(NSString *s, BOOL showLinks);
 NSString *TwineVersion();
 NSString *XMLEscape(NSString *string);

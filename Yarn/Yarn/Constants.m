@@ -24,9 +24,10 @@ const NSString *kYarnKeyDefaultStoryFormat = @"com.mjdocumento.default.story.for
 const NSString *kYarnKeyProofingFormat = @"com.mjdocumento.proofing.format";
 const NSString *kYarnKeySnapToGrid = @"com.mjdocumento.snap.to.grid";
 
-const NSString *kYarnStorySaveDir = @"stories";
+const NSString *kYarnStoryImportDir = @"import";
 const NSString *kYarnStoryFormatSaveDir = @"formats";
 const NSString *kYarnStoryProofingFormatSaveDir = @"proofing-formats";
+const NSString *kYarnStorySaveDir = @"stories";
 
 const NSInteger kDuplicatePassageName = -1;
 const NSInteger kNoPath = -2;

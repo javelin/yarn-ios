@@ -34,6 +34,36 @@ NSString *AppVersion() {
     return appVersion;
 }
 
+BOOL CreateDir(NSString *path, BOOL overwrite, NSError **error) {
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    BOOL exists, isDir;
+    exists = [fileManager fileExistsAtPath:path isDirectory:&isDir];
+    NSError *error_ = nil;
+    if (exists) {
+        if (overwrite || !isDir) {
+            [fileManager removeItemAtPath:path error:&error_];
+            if (error_) {
+                if (error) {
+                    *error = error_;
+                }
+                return NO;
+            }
+        }
+        else {
+            return NO;
+        }
+    }
+    [fileManager createDirectoryAtPath:path
+           withIntermediateDirectories:NO
+                            attributes:nil
+                                 error:&error_];
+    if (error) {
+        *error = error_;
+    }
+    
+    return error_ == nil;
+}
+
 void DispatchAsync(dispatch_block_t block) {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), block);
 }
