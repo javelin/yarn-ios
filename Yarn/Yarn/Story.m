@@ -190,6 +190,15 @@ static NSString *_template = @"<tw-storydata name=\"%@\" startnode=\"%@\" creato
         Regex *regex = [Regex regex:@"<tw-storydata.*?</tw-storydata>"
                             options:NSRegularExpressionDotMatchesLineSeparators | NSRegularExpressionUseUnixLineSeparators];
         NSString *storyData = [[regex matchOne:contents] group:0];
+        if (!storyData) {
+            if (errorHandler) {
+                error = [NSError errorWithDomain:@"Story" code:kInvalidTwine2File userInfo:@{NSLocalizedDescriptionKey:_LS(@"File is not in Twine 2 format.")}];
+                DispatchAsyncMain(^{
+                    errorHandler(error);
+                });
+            }
+            return;
+        }
         NSXMLParser *parser = [[NSXMLParser alloc] initWithData:[storyData dataUsingEncoding:NSUTF8StringEncoding]];
         [parser setDelegate:self];
         _elementStack = [NSMutableArray array];

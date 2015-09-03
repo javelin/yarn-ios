@@ -37,3 +37,4 @@ const NSInteger kInvalidPath = -5;
 const NSInteger kCantOpenArchive = -6;
 const NSInteger kCantWriteToArchive = -7;
 const NSInteger kCantCloseArchive = -8;
+const NSInteger kInvalidTwine2File = -9;
