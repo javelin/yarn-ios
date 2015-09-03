@@ -203,7 +203,7 @@ static CGFloat GridSpacing = 140.0;
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [[self navigationController] setNavigationBarHidden:NO animated:YES];
-    //[[[self navigationController] navigationBar] addGestureRecognizer:_tapGestureRecognizer];
+    [[[self navigationController] navigationBar] addGestureRecognizer:_tapGestureRecognizer];
     [self setTitle:[_story name]];
 }
 
@@ -213,11 +213,11 @@ static CGFloat GridSpacing = 140.0;
     [self setTitle:@""];
 }
 
-- (void)willMoveToParentViewController:(nullable UIViewController *)parent {
-    if (!parent) {
-        [self handleCloseStory];
-    }
-}
+//- (void)willMoveToParentViewController:(nullable UIViewController *)parent {
+//    if (!parent) {
+//        [self handleCloseStory];
+//    }
+//}
 
 #pragma mark Autosave
 - (void)autosave {
