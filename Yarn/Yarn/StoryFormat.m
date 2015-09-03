@@ -259,6 +259,7 @@ typedef void (^StoryFormatCompletionBlock)(StoryFormat *storyFormat);
                                                   range:NSMakeRange(0, [[story name] length])];
             fname = [fname stringByAppendingFormat:@"-%@", [story ifId]];
             fname = [fname stringByAppendingPathExtension:@"export"];
+            fname = [fname stringByAppendingPathExtension:[self isProofing] ? @"proof":@"game"];
             fname = [fname stringByAppendingPathExtension:@"zip"];
             NSString *zpath = [[path stringByDeletingLastPathComponent]
                                stringByAppendingPathComponent:fname];

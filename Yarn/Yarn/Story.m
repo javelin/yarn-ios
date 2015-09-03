@@ -436,6 +436,7 @@ static NSString *_template = @"<tw-storydata name=\"%@\" startnode=\"%@\" creato
                                                   range:NSMakeRange(0, [_name length])];
             fname = [fname stringByAppendingFormat:@"-%@", _ifId];
             fname = [fname stringByAppendingPathExtension:@"export"];
+            fname = [fname stringByAppendingPathExtension:@"story"];
             fname = [fname stringByAppendingPathExtension:@"zip"];
             NSString *zpath = [path stringByAppendingPathComponent:fname];
             SSZipArchive *zipper = [[SSZipArchive alloc] initWithPath:zpath];
