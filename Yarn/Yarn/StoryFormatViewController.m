@@ -25,7 +25,6 @@ static NSString *template = @"<html><head><style>body, p {font-family: helvetica
     self = [super init];
     if (self) {
         _proofing = [storyFormat isProofing];
-        NSLog(@"%@ %@", [self currentDefaultFormat], [storyFormat name]);
         _isDefault = [[self currentDefaultFormat] isEqualToString:[storyFormat name]];
         [self setTitle:[storyFormat name]];
         
