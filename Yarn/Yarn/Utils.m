@@ -29,7 +29,8 @@ NSString *AppName() {
 NSString *AppVersion() {
     static NSString *appVersion;
     if (!appVersion) {
-        appVersion = BUNDLE_VALUE((NSString *)kCFBundleVersionKey);
+        //appVersion = BUNDLE_VALUE((NSString *)kCFBundleVersionKey);
+        appVersion = BUNDLE_VALUE(@"CFBundleShortVersionString");
     }
     return appVersion;
 }
