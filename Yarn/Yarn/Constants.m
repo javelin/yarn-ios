@@ -12,8 +12,8 @@ const NSString *kBundleTwineVersionKey = @"com.mjdocumento.twine.version";
 const NSString *kBundleYarnSourceURL = @"com.mjdocumento.yarn.source.url";
 const NSString *kBundleMyEmail = @"com.mjdocumento.my.email";
 const NSTimeInterval kYarnDefaultAutosaveInterval = 300.0; // five minutes
-const NSString *kYarnDefaultProofingFormat = @"Harlowe";
-const NSString *kYarnDefaultStoryFormat = @"Paperthin";
+const NSString *kYarnDefaultProofingFormat = @"Paperthin";
+const NSString *kYarnDefaultStoryFormat = @"Harlowe";
 
 const CGFloat kYarnFontSizeAutosave = 10.0;
 const CGFloat kYarnFontSizeAutosaveIpad = 12.0;
