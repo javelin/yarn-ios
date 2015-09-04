@@ -42,13 +42,6 @@
         [self createViews];
         [self addConstraints];
         
-        _closeButtonItem =
-        [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"close"]
-                                         style:UIBarButtonItemStylePlain
-                                        target:self
-                                        action:@selector(handleDoneEditing)];
-        [[self navigationItem] setLeftBarButtonItem:_closeButtonItem];
-        
         _hideKeyboardButtonItem =
         [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"hide-keyboard"]
                                          style:UIBarButtonItemStylePlain
@@ -252,6 +245,7 @@
 
 - (void)willMoveToParentViewController:(nullable UIViewController *)parent {
     if (!parent) {
+        [self handleDoneEditing];
         NSAssert([_delegate respondsToSelector:@selector(passageEditorViewController:didFinish:)],
                  @"id<PassageEditorViewControllerDelegate> must implement passageEditorViewController:didFinish:");
         [_delegate performSelector:@selector(passageEditorViewController:didFinish:)
@@ -298,7 +292,6 @@
 - (void)handleDoneEditing {
     [self invalidateAutosaveTimer];
     [self updatePassage];
-    [[self navigationController] popViewControllerAnimated:YES];
 }
 
 - (void)handleHideKeyboard {

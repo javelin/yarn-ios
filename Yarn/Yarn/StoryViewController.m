@@ -34,7 +34,6 @@
 
 @property (nonatomic, strong) UIDocumentInteractionController *exportInteractionController;
 @property (nonatomic, strong) UIScrollView *scrollView;
-@property (nonatomic, strong) UITapGestureRecognizer *tapGestureRecognizer;
 
 @end
 
@@ -88,14 +87,6 @@ static CGFloat GridSpacing = 140.0;
         [self createViews];
         
         [self setTitle:story.name];
-        
-        _tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTitleTapped)];
-        
-        [[self navigationItem] setLeftBarButtonItem:
-         [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"close"]
-                                          style:UIBarButtonItemStylePlain
-                                         target:self
-                                         action:@selector(handleCloseStory)]];
         
         UIBarButtonItem* add =
         [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
@@ -203,21 +194,19 @@ static CGFloat GridSpacing = 140.0;
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [[self navigationController] setNavigationBarHidden:NO animated:YES];
-    [[[self navigationController] navigationBar] addGestureRecognizer:_tapGestureRecognizer];
     [self setTitle:[_story name]];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    [[[self navigationController] navigationBar] removeGestureRecognizer:_tapGestureRecognizer];
     [self setTitle:@""];
 }
 
-//- (void)willMoveToParentViewController:(nullable UIViewController *)parent {
-//    if (!parent) {
-//        [self handleCloseStory];
-//    }
-//}
+- (void)willMoveToParentViewController:(nullable UIViewController *)parent {
+    if (!parent) {
+        [self handleCloseStory];
+    }
+}
 
 #pragma mark Autosave
 - (void)autosave {
