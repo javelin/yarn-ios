@@ -255,6 +255,7 @@ static NSString *_template = @"<tw-storydata name=\"%@\" startnode=\"%@\" creato
                     error:(void (^)(NSError *error))errorHandler {
     DispatchAsync(^{
         [_passages removeAllObjects];
+        _passageId = 0;
         
         TextLineReader *reader = [TextLineReader readerWithFilePath:path];
         if (!reader) {
@@ -316,7 +317,7 @@ static NSString *_template = @"<tw-storydata name=\"%@\" startnode=\"%@\" creato
                             isImage = isImage || [tag isEqualToString:@"Twine.image"];
                         }
                     }
-                    passage = [Passage passageInStory:nil
+                    passage = [Passage passageInStory:self
                                                    Id:-1
                                                 named:TRIM([match group:1])
                                                  text:@""

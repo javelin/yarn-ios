@@ -90,6 +90,7 @@ static NSString *_duplicateNameError = @"There is already a passage named \"%@.\
     Regex *type1b = [Regex regex:@"\\[\\[([^\\|\\]]*?)<\\-([^\\|\\]]*)?\\]\\]"]; // [[link<-display text]] format
     Regex *type2 = [Regex regex:@"\\[\\[([^\\|\\]]*?)\\|([^\\|\\]]*)?\\]\\]"]; // [[display text|link]] format
     Regex *type3 = [Regex regex:@"\\[\\[|\\]\\]"]; // [[link]] format
+    Regex *oldTypeSetters = [Regex regex:@"\\[(\\[.*?\\])(\\[.*?\\])\\]"]; // [[link][variable setter]] or [[display text|link][variable setter]]
     
     Regex *externalLink = [Regex regex:@"^\\w+:\\/\\/\\/?\\w"];
     
@@ -100,8 +101,10 @@ static NSString *_duplicateNameError = @"There is already a passage named \"%@.\
         if ([link notEmpty]) {
             link = [type1a replace:link template:@"$2"];
             link = [type1b replace:link template:@"$1"];
+            link = [oldTypeSetters replace:link template:@"[$1]"];
             link = [type2 replace:link template:@"$2"];
             link = [type3 replace:link template:@""];
+            
             if ([link notEmpty]) {
                 if (internalOnly) {
                     if ([externalLink matchOne:link]) {
