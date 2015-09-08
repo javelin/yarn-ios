@@ -53,17 +53,15 @@
 }
 
 - (NSArray *)allGroups:(NSString *)defaultVal {
-    NSMutableArray *groups = [NSMutableArray arrayWithCapacity:[_groups count] - 1];
+    NSMutableArray *groups = [NSMutableArray arrayWithCapacity:[_groups count]];
     for (NSValue *v in _groups) {
-        if (v != [_groups firstObject]) {
-            NSRange range = [v rangeValue];
-            if (range.location == NSNotFound) {
-                NSAssert(defaultVal != nil, @"defaultVal should not be nil");
-                [groups addObject:defaultVal];
-            }
-            else {
-                [groups addObject:[_source substringWithRange:range]];
-            }
+        NSRange range = [v rangeValue];
+        if (range.location == NSNotFound) {
+            NSAssert(defaultVal != nil, @"defaultVal should not be nil");
+            [groups addObject:defaultVal];
+        }
+        else {
+            [groups addObject:[_source substringWithRange:range]];
         }
     }
     return [NSArray arrayWithArray:groups];
