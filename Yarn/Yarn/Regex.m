@@ -52,13 +52,16 @@
     return [_groups count];
 }
 
-- (NSArray *)allGroups:(NSString *)defaultVal {
+- (NSArray *)allGroups {
+    return [self allGroups:nil];
+}
+
+- (NSArray *)allGroups:(__nullable NSString *)defaultVal {
     NSMutableArray *groups = [NSMutableArray arrayWithCapacity:[_groups count]];
     for (NSValue *v in _groups) {
         NSRange range = [v rangeValue];
         if (range.location == NSNotFound) {
-            NSAssert(defaultVal != nil, @"defaultVal should not be nil");
-            [groups addObject:defaultVal];
+            [groups addObject:defaultVal ? defaultVal:[NSNull null]];
         }
         else {
             [groups addObject:[_source substringWithRange:range]];

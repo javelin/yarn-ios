@@ -19,6 +19,7 @@
 
 - (NSString *)group:(NSUInteger)index;
 - (NSRange)range:(NSUInteger)index;
+- (NSArray *)allGroups;
 - (NSArray *)allGroups:(NSString *)defaultVal;
 
 @end
