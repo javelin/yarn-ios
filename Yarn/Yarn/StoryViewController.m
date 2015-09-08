@@ -250,7 +250,7 @@ static CGFloat GridSpacing = 140.0;
          _exportInteractionController =
          [UIDocumentInteractionController interactionControllerWithURL:url];
          [_exportInteractionController
-          presentOpenInMenuFromBarButtonItem:[[self navigationItem] leftBarButtonItem]
+          presentOpenInMenuFromBarButtonItem:[[self navigationItem] rightBarButtonItem]
           animated:YES];
      }
      error:^(NSError *error) {
@@ -395,7 +395,7 @@ static CGFloat GridSpacing = 140.0;
     //iPad
     UIPopoverPresentationController *presentationController =
     [_exportArchiveMenuController popoverPresentationController];
-    [presentationController setBarButtonItem:[[self navigationItem] leftBarButtonItem]];
+    [presentationController setBarButtonItem:[[self navigationItem] rightBarButtonItem]];
     [presentationController setPermittedArrowDirections:UIPopoverArrowDirectionAny];
     
     [self presentViewController:_exportArchiveMenuController
@@ -439,7 +439,7 @@ static CGFloat GridSpacing = 140.0;
     //iPad
     UIPopoverPresentationController *presentationController =
     [_exportHtmlMenuController popoverPresentationController];
-    [presentationController setBarButtonItem:[[self navigationItem] leftBarButtonItem]];
+    [presentationController setBarButtonItem:[[self navigationItem] rightBarButtonItem]];
     [presentationController setPermittedArrowDirections:UIPopoverArrowDirectionAny];
     
     [self presentViewController:_exportHtmlMenuController
@@ -511,7 +511,7 @@ static CGFloat GridSpacing = 140.0;
     //iPad
     UIPopoverPresentationController *presentationController =
     [_menuController popoverPresentationController];
-    [presentationController setBarButtonItem:[[self navigationItem] leftBarButtonItem]];
+    [presentationController setBarButtonItem:[[self navigationItem] rightBarButtonItem]];
     [presentationController setPermittedArrowDirections:UIPopoverArrowDirectionAny];
     
     [self presentViewController:_menuController
@@ -608,7 +608,7 @@ static CGFloat GridSpacing = 140.0;
                      _exportInteractionController =
                      [UIDocumentInteractionController interactionControllerWithURL:url];
                      [_exportInteractionController
-                      presentOpenInMenuFromBarButtonItem:[[self navigationItem] leftBarButtonItem]
+                      presentOpenInMenuFromBarButtonItem:[[self navigationItem] rightBarButtonItem]
                       animated:YES];
                  }
                  else {

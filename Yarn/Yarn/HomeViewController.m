@@ -123,7 +123,7 @@
     // For iPad
     UIPopoverPresentationController *popoverController =
     [alertController popoverPresentationController];
-    [popoverController setBarButtonItem:[[self navigationItem] leftBarButtonItem]];
+    [popoverController setBarButtonItem:[[self navigationItem] rightBarButtonItem]];
     [popoverController setPermittedArrowDirections:UIPopoverArrowDirectionAny];
     
     [self presentViewController:alertController
