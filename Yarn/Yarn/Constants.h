@@ -34,6 +34,7 @@ extern const NSInteger kNoPath;
 extern const NSInteger kNoStartingPoint;
 extern const NSInteger kStartingPointNonExistent;
 extern const NSInteger kInvalidPath;
+extern const NSInteger kInvalidTweeFile;
 extern const NSInteger kInvalidTwine2File;
 extern const NSInteger kCantOpenArchive;
 extern const NSInteger kCantWriteToArchive;

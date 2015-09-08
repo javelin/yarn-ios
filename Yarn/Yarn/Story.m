@@ -11,6 +11,7 @@
 #import "Regex.h"
 #import "SSZipArchive.h"
 #import "Story.h"
+#import "TextLineReader.h"
 #import "Utils.h"
 
 typedef void (^StoryCompletionBlock)(Story *story);
@@ -235,6 +236,158 @@ static NSString *_template = @"<tw-storydata name=\"%@\" startnode=\"%@\" creato
     [story setPath:path];
     
     return story;
+}
+
++ (void)loadTweeFromPath:(NSString *)path
+               imageData:(void (^)(NSData *imageData, NSString *filename))imageDataHandler
+              completion:(void (^)(Story *story))completionHandler
+                   error:(void (^)(NSError *error))errorHandler {
+    Story *story = [[Story alloc] initWithDefaults];
+    [story _loadTweeFromPath:path
+                   imageData:imageDataHandler
+                  completion:completionHandler
+                       error:errorHandler];
+}
+
+- (void)_loadTweeFromPath:(NSString *)path
+                imageData:(void (^)(NSData *imageData, NSString *filename))imageDataHandler
+               completion:(void (^)(Story *story))completionHandler
+                    error:(void (^)(NSError *error))errorHandler {
+    DispatchAsync(^{
+        [_passages removeAllObjects];
+        
+        TextLineReader *reader = [TextLineReader readerWithFilePath:path];
+        if (!reader) {
+            if (errorHandler) {
+                DispatchAsyncMain(^{
+                    
+                });
+            }
+            return;
+        }
+        
+        Regex *headerRegex = [Regex regex:@"^:: ([^\\[]+)(\\[([^\\]]*)\\])*"];
+        Regex *imageRegex = [Regex regex:@"^(data:image/([^;]+);base64,)"];
+        Regex *tagsRegex = [Regex regex:@"([^ ]+)"];
+        __block Passage *passage = nil;
+        __block int nblanks = 0;
+        __block BOOL isImage = NO;
+
+        [reader enumerateTrimmedLinesUsingBlock:^(NSString *line, BOOL *stop) {
+            if ([line hasPrefix:@":: "] &&
+                (nblanks == 2 || !passage)) {
+                RegexMatch *match = [headerRegex matchOne:line];
+                if (match) {
+                    if (passage) {
+                        if (isImage) {
+                            if (imageDataHandler) {
+                                RegexMatch *match = [imageRegex matchOne:[passage text]];
+                                if (match) {
+                                    NSData *imageData =
+                                    [[NSData alloc] initWithBase64EncodedString:
+                                     [[passage text] substringFromIndex:[match range:1].length]
+                                                                        options:0];
+                                    imageDataHandler(imageData,
+                                                     [[passage name] stringByAppendingPathExtension:
+                                                      [match group:2]]);
+                                }
+                            }
+                        }
+                        else {
+                            if ([[passage name] isEqualToString:@"StoryTitle"]) {
+                                _name = [passage text];
+                            }
+                            else {
+                                [_passages setObject:passage forKey:[passage name]];
+                                if ([[passage name] isEqualToString:@"Start"]) {
+                                    _startPassage = @"Start";
+                                }
+                            }
+                        }
+                    }
+                    
+                    NSString *tagStr = [match group:3];
+                    NSMutableArray *tags = [NSMutableArray array];
+                    isImage = NO;
+                    if ([tagStr notEmpty]) {
+                        for (RegexMatch *matchedTag in [tagsRegex matchAll:tagStr]) {
+                            NSString *tag = [matchedTag group:1];
+                            [tags addObject:tag];
+                            isImage = isImage || [tag isEqualToString:@"Twine.image"];
+                        }
+                    }
+                    passage = [Passage passageInStory:nil
+                                                   Id:-1
+                                                named:TRIM([match group:1])
+                                                 text:@""
+                                                 tags:tags];
+                    [passage setLeft:-1];
+                    [passage setTop:-1];
+                    nblanks = 0;
+                    
+                    return;
+                }
+            }
+            
+            if ([line notEmpty]) {
+                if (passage) {
+                    if ([[passage text] notEmpty]) {
+                        [passage setText:[[passage text] stringByAppendingFormat:@"\n%@", line]];
+                    }
+                    else {
+                        [passage setText:line];
+                    }
+                }
+                nblanks = 0;
+            }
+            else {
+                if (++nblanks > 2) {
+                    if (passage) {
+                        [passage setText:[[passage text] stringByAppendingString:@"\n"]];
+                    }
+                    nblanks = 2;
+                }
+            }
+        }];
+        
+        if (passage) {
+            if (isImage) {
+                if (imageDataHandler) {
+                    RegexMatch *match = [imageRegex matchOne:[passage text]];
+                    if (match) {
+                        NSData *imageData =
+                        [[NSData alloc] initWithBase64EncodedString:
+                         [[passage text] substringFromIndex:[match range:0].length]
+                                                            options:0];
+                        imageDataHandler(imageData,
+                                         [[passage name] stringByAppendingPathExtension:
+                                          [match group:1]]);
+                    }
+                }
+            }
+            else {
+                if ([[passage name] isEqualToString:@"StoryTitle"]) {
+                    _name = [passage text];
+                }
+                else {
+                    [_passages setObject:passage forKey:[passage name]];
+                    if ([[passage name] isEqualToString:@"Start"]) {
+                        _startPassage = @"Start";
+                    }
+                }
+            }
+        }
+        else {
+            if (errorHandler) {
+                NSError *error = error = [NSError errorWithDomain:@"Story" code:kInvalidTweeFile userInfo:@{NSLocalizedDescriptionKey:_LS(@"No passages imported. Might be invalid or corrupt twee file.")}];
+                errorHandler(error);
+            }
+        }
+        
+        if (completionHandler) {
+            completionHandler(self);
+        }
+    });
 }
 
 - (NSInteger)nextId {

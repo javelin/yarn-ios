@@ -159,6 +159,9 @@ static CGFloat GridSpacing = 140.0;
         if ([[_story startPassage] isEqualToString:[passage name]]) {
             [pv setStartPassage:YES];
         }
+        if ([pv pos].x < 0 || [pv pos].y < 0) {
+            [self findSpaceFor:pv];
+        }
         if ([pv bottomRightCorner].x > largestX) {
             largestX = [pv bottomRightCorner].x;
         }

@@ -130,6 +130,11 @@ typedef enum StorySortMethod {
             if ([[url pathExtension] isEqualToString:@"zip"]) {
                 [self importZip:url];
             }
+            else if ([[url pathExtension] isEqualToString:@"tw"] ||
+                     [[url pathExtension] isEqualToString:@"twee"] ||
+                     [[url pathExtension] isEqualToString:@"txt"]) {
+                [self importTwee:url];
+            }
             else {
                 [self importHtml:url];
             }
@@ -186,6 +191,105 @@ typedef enum StorySortMethod {
              AlertError(_LS(@"Unable to import story."),
                         self);
          });
+     }];
+}
+
+- (void)importTwee:(NSURL *)url {
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    void (^removeUrl)() = ^{
+        NSError *error = nil;
+        [fileManager removeItemAtURL:url error:&error];
+        if (error) {
+            NSLog(@"%@", error);
+        }
+    };
+    
+    NSString *tempDir = [[self importDir] stringByAppendingPathComponent:[[NSUUID new] UUIDString]];
+    NSString *imagesDir = [tempDir stringByAppendingPathComponent:@"images"];
+    NSError *error = nil;
+    [fileManager createDirectoryAtPath:imagesDir
+           withIntermediateDirectories:YES
+                            attributes:nil
+                                 error:&error];
+    if (error) {
+        NSLog(@"%@", error);
+        removeUrl();
+        HIDE_WAIT();
+        return;
+    }
+    
+    void (^removeTempFiles)() = ^{
+        removeUrl();
+        NSError *error = nil;
+        [fileManager removeItemAtPath:tempDir error:&error];
+        if (error) {
+            NSLog(@"%@", error);
+        }
+    };
+    
+    __block int imageFiles = 0;
+    [Story
+     loadTweeFromPath:[url path]
+     imageData:^(NSData *imageData, NSString *filename) {
+         [imageData writeToFile:[imagesDir stringByAppendingPathComponent:filename]
+                     atomically:NO];
+         imageFiles++;
+     }
+     completion:^(Story *story) {
+         if (![[story ifId] notEmpty]) {
+             [story setIfId:[tempDir lastPathComponent]];
+         }
+         
+         for (Story *story_ in _stories) {
+             if ([[story ifId] isEqualToString:[story_ ifId]]) {
+                 [story setIfId:[[NSUUID new] UUIDString]];
+                 break;
+             }
+         }
+         
+         NSError *error = nil;
+         [fileManager moveItemAtPath:tempDir
+                              toPath:[[self saveDir] stringByAppendingPathComponent:
+                                      [story ifId]]
+                               error:&error];
+         if (error) {
+             HIDE_WAIT();
+             NSLog(@"%@", error);
+             removeTempFiles();
+         }
+         else {
+             [story setPath:[[self saveDir] stringByAppendingPathComponent:
+                             [story ifId]]];
+             [story
+              save:^(Story *story) {
+                  [_stories addObject:story];
+                  [self sortObjects];
+                  DispatchAsyncMain(^{
+                      [[self tableView] reloadData];
+                      HIDE_WAIT();
+                      NSString *msg = imageFiles ?
+                      [NSString stringWithFormat:_LS(@"Story successfully imported. Imported %d image files. You may have to manually look for and edit links to these images in the story passages."), imageFiles]:
+                      _LS(@"Story successfully imported.");
+                      AlertInfo(_LS(@"Import"),
+                                msg,
+                                _LS(@"Close"),
+                                self);
+                  });
+                  removeUrl();
+              }
+              error:^(NSError *error) {
+                  HIDE_WAIT();
+                  AlertError(_LS(@"Unable to import twee file."),
+                             self);
+                  removeTempFiles();
+              }];
+         }
+     }
+     error:^(NSError *error) {
+         HIDE_WAIT();
+         AlertError(_LS(@"Unable to import twee file."),
+                    self);
+         removeTempFiles();
      }];
 }
 

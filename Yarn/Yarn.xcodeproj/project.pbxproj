@@ -55,6 +55,8 @@
 		4DE0E05E1B8A86A600A38055 /* AutosavingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE0E05D1B8A86A600A38055 /* AutosavingViewController.m */; };
 		4DEB4F011B8DBC7E00D1FBB4 /* MediaGalleryViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEB4F001B8DBC7E00D1FBB4 /* MediaGalleryViewCell.m */; };
 		4DEB4F041B8DBF4D00D1FBB4 /* MediaGalleryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEB4F031B8DBF4D00D1FBB4 /* MediaGalleryViewController.m */; };
+		4DEDDE1C1B9ED259005F07B3 /* NSData+Range.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEDDE191B9ED259005F07B3 /* NSData+Range.m */; };
+		4DEDDE1D1B9ED259005F07B3 /* TextLineReader.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEDDE1B1B9ED259005F07B3 /* TextLineReader.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -167,6 +169,10 @@
 		4DEB4F001B8DBC7E00D1FBB4 /* MediaGalleryViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MediaGalleryViewCell.m; sourceTree = "<group>"; };
 		4DEB4F021B8DBF4D00D1FBB4 /* MediaGalleryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MediaGalleryViewController.h; sourceTree = "<group>"; };
 		4DEB4F031B8DBF4D00D1FBB4 /* MediaGalleryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MediaGalleryViewController.m; sourceTree = "<group>"; };
+		4DEDDE181B9ED259005F07B3 /* NSData+Range.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Range.h"; sourceTree = "<group>"; };
+		4DEDDE191B9ED259005F07B3 /* NSData+Range.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Range.m"; sourceTree = "<group>"; };
+		4DEDDE1A1B9ED259005F07B3 /* TextLineReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextLineReader.h; sourceTree = "<group>"; };
+		4DEDDE1B1B9ED259005F07B3 /* TextLineReader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TextLineReader.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -275,6 +281,8 @@
 				4DCDB7541B80156D0005252F /* en.lproj */,
 				4D4D9B941B7EDED200E1875B /* Info.plist */,
 				4D4D9B911B7EDED200E1875B /* LaunchScreen.storyboard */,
+				4DEDDE181B9ED259005F07B3 /* NSData+Range.h */,
+				4DEDDE191B9ED259005F07B3 /* NSData+Range.m */,
 				4DCDB71A1B8014840005252F /* NSData+UTF8String.h */,
 				4DCDB71B1B8014840005252F /* NSData+UTF8String.m */,
 				4DCDB71C1B8014840005252F /* NSObject+Associative.h */,
@@ -286,6 +294,8 @@
 				4DCDB74D1B80155E0005252F /* resources */,
 				4DCDB75E1B80163D0005252F /* storyformats */,
 				4D4D9B831B7EDED200E1875B /* Supporting Files */,
+				4DEDDE1A1B9ED259005F07B3 /* TextLineReader.h */,
+				4DEDDE1B1B9ED259005F07B3 /* TextLineReader.m */,
 				4DCDB7431B80151B0005252F /* twine */,
 				4D4D9BB61B7F563100E1875B /* ui */,
 				4DCDB7221B8014840005252F /* Utils.h */,
@@ -584,6 +594,7 @@
 				4D4D9B851B7EDED200E1875B /* main.m in Sources */,
 				4DCDB7321B8014AB0005252F /* WebViewController.m in Sources */,
 				4DCDB7381B8014D00005252F /* StoryFormatsViewController.m in Sources */,
+				4DEDDE1C1B9ED259005F07B3 /* NSData+Range.m in Sources */,
 				4D247AAF1B92A02E00E12D94 /* mztools.c in Sources */,
 				4DCDB74A1B8015410005252F /* Passage.m in Sources */,
 				4DCDB7281B8014840005252F /* Regex.m in Sources */,
@@ -592,6 +603,7 @@
 				4DCDB7271B8014840005252F /* NSString+TestNonEmpty.m in Sources */,
 				4DCDB7241B8014840005252F /* Constants.m in Sources */,
 				4D247AAE1B92A02E00E12D94 /* ioapi.c in Sources */,
+				4DEDDE1D1B9ED259005F07B3 /* TextLineReader.m in Sources */,
 				4DA03E491B8B243200DA9A3F /* StorySettingsPageViewController.m in Sources */,
 				4D399A531B8EE54C00A153C9 /* StoryFormatViewController.m in Sources */,
 				4D247AB21B92A02E00E12D94 /* SSZipArchive.m in Sources */,

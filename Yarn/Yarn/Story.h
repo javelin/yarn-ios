@@ -39,6 +39,10 @@
 - (void)load:(void (^)(Story *story))completionHandler
        error:(void (^)(NSError *error))errorHandler;
 + (Story *)loadInfo:(NSString *)path error:(NSError **)error;
++ (void)loadTweeFromPath:(NSString *)path
+               imageData:(void (^)(NSData *imageData, NSString *filename))imageDataHandler
+              completion:(void (^)(Story *story))completionHandler
+                   error:(void (^)(NSError *error))errorHandler;
 - (NSInteger)nextId;
 - (NSString *)publishWithStartId:(NSInteger)startId
                  startIsOptional:(BOOL)startIsOptional
